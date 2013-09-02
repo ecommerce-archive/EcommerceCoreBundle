@@ -59,3 +59,8 @@ To try the bundle in development, just run:
     php app/console doctrine:phpcr:workspace:create default
     php app/console doctrine:phpcr:repository:init
     php app/console doctrine:schema:update --force
+
+
+### License: MIT
+
+See [``Resources/meta/LICENSE``](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Resources/meta/LICENSE) file.

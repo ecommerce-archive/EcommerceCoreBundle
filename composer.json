@@ -13,7 +13,9 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/framework-bundle": "~2.2",
-        "jackalope/jackalope-doctrine-dbal": "1.0.0-beta3"
+        "jackalope/jackalope-doctrine-dbal": "1.0.0-beta3",
+        "doctrine/phpcr-bundle": "1.0.0-beta4",
+        "doctrine/phpcr-odm": "1.0.0-beta5"
     },
     "autoload":{
         "psr-0":{

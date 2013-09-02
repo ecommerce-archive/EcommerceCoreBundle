@@ -62,7 +62,13 @@ class Manager
         $product->setName($name);
 
         if ($withNode) {
-            $product->node = new Node(new Factory(), new \stdClass(), $this->getProductNode()->getId().'/'.$product->getNodename(), $this->dm->getPhpcrSession(), $this->dm->getPhpcrSession()->getObjectManager());
+            $product->node = new Node(
+                new Factory(),
+                new \stdClass(),
+                $this->getProductNode()->getId().'/'.$product->getNodename(),
+                $this->dm->getPhpcrSession(),
+                $this->dm->getPhpcrSession()->getObjectManager()
+            );
         }
 
         return $product;
@@ -92,10 +98,15 @@ class Manager
         }
     }
 
+    /**
+     * @param string $id
+     * @return Product|null
+     */
     public function find($id)
     {
         return $this->dm->find(null, $id);
     }
+
     /**
      * @param bool $reload
      * @return Product[]

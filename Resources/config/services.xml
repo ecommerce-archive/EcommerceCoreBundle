@@ -6,6 +6,8 @@
 
     <parameters>
         <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
+        <parameter key="ecommerce_core.product.class">Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product</parameter>
+        <parameter key="ecommerce_core.product_reference.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference</parameter>
         <parameter key="ecommerce_core.event_listener.doctrine_orm_event_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrineOrmEventSubscriber</parameter>
         <parameter key="ecommerce_core.event_listener.doctrine_phpcr_event_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrinePhpcrEventSubscriber</parameter>
     </parameters>
@@ -16,7 +18,7 @@
             class="Doctrine\ODM\PHPCR\DocumentRepository"
             factory-service="doctrine_phpcr.odm.document_manager"
             factory-method="getRepository">
-            <argument>EcommerceCoreBundle:Product</argument>
+            <argument>Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product</argument>
         </service>
 
         <service id="ecommerce_core.product_reference.repository"

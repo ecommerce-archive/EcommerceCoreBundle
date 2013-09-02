@@ -11,7 +11,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
 
-class DoctrineOrmEventSubscriber implements EventSubscriber
+class DoctrineOrmSubscriber implements EventSubscriber
 {
     /**
      * @var ContainerInterface

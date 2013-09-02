@@ -16,7 +16,7 @@ use Doctrine\Common\Util\ClassUtils;
 //use GlamourRent\AppBundle\Form\DataMapper\PreparedPropertyAccessor;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
 
-class DoctrinePhpcrEventSubscriber implements EventSubscriber
+class DoctrinePhpcrSubscriber implements EventSubscriber
 {
     protected $productType;
 

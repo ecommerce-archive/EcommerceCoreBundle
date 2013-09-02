@@ -1,0 +1,37 @@
+<doctrine-mapping
+    xmlns="http://doctrine-project.org/schemas/phpcr-odm/phpcr-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://doctrine-project.org/schemas/phpcr-odm/phpcr-mapping
+    https://github.com/doctrine/phpcr-odm/raw/master/doctrine-phpcr-odm-mapping.xsd"
+    >
+
+    <document
+        name="Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product"
+        referenceable="true"
+        translator="attribute"
+        >
+
+        <mixins>
+            <mixin type="mix:created" />
+            <mixin type="mix:lastModified" />
+        </mixins>
+
+        <id name="id">
+            <generator strategy="PARENT" />
+        </id>
+
+        <nodename name="nodename" />
+
+        <parent-document name="parent" />
+
+        <node name="node" />
+
+        <locale name="locale" />
+
+        <field name="name" type="string" translated="true" />
+
+        <field name="status" type="long" />
+
+    </document>
+
+</doctrine-mapping>

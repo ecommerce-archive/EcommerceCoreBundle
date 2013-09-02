@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference" table="ecommerce_product_reference"
+        repository-class="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository">
+
+        <id name="id" type="guid" column="id" column-definition="CHAR(36) NOT NULL" />
+
+        <!--<id name="id" type="guid" column="id" column-definition="CHAR(36) NOT NULL">
+            <generator strategy="UUID" />
+        </id>-->
+
+        <field name="name" type="string" column="name" length="255" />
+    </entity>
+</doctrine-mapping>

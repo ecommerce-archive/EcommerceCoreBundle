@@ -7,4 +7,25 @@
     <route id="ecommerce_core_homepage" pattern="/sandbox">
         <default key="_controller">EcommerceCoreBundle:Sandbox:index</default>
     </route>
+
+    <route id="ecommerce_products" pattern="/products/" methods="GET">
+        <default key="_controller">EcommerceCoreBundle:Sandbox:index</default>
+    </route>
+
+    <route id="ecommerce_product_create" pattern="/products/" methods="POST">
+        <default key="_controller">EcommerceCoreBundle:Sandbox:create</default>
+    </route>
+
+    <route id="ecommerce_product_view" pattern="/products/{id}" methods="GET">
+        <default key="_controller">EcommerceCoreBundle:Sandbox:view</default>
+    </route>
+
+    <route id="ecommerce_product_update" pattern="/products/{id}" methods="PUT">
+        <default key="_controller">EcommerceCoreBundle:Sandbox:update</default>
+    </route>
+
+    <route id="ecommerce_product_delete" pattern="/products/{id}" methods="DELETE">
+        <default key="_controller">EcommerceCoreBundle:Sandbox:delete</default>
+    </route>
+
 </routes>

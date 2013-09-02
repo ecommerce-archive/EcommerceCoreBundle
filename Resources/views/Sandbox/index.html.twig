@@ -2,4 +2,34 @@
 
 {% block body %}
 Hello {{ name }}!
+
+{% if products|length > 0 %}
+  <ul>
+  {% for product in products %}
+    <li>
+      {{ product.nodename }}
+
+      <form action="{{ path('ecommerce_product_update', { 'id': product.getIdentifier }) }}" method="post">
+        <input type="hidden" name="_method" value="PUT" />
+        <input type="text" name="name" value="{{ product.name }}" />
+        <button type="submit">save</button>
+      </form>
+
+      <form action="{{ path('ecommerce_product_delete', { 'id': product.getIdentifier }) }}" method="post">
+        <input type="hidden" name="_method" value="DELETE" />
+        <button type="submit">x</button>
+      </form>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  no products found
+{% endif %}
+
+  <form action="{{ path('ecommerce_product_create') }}" method="post">
+    {# <input type="hidden" name="_method" value="DELETE" /> #}
+    <input type="text" name="name" />
+    <button type="submit">create</button>
+  </form>
+
 {% endblock %}

@@ -4,17 +4,60 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
-    <!--
     <parameters>
-        <parameter key="ecommerce_core.example.class">Ecommerce\Bundle\CoreBundle\Example</parameter>
+        <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
+        <parameter key="ecommerce_core.event_listener.doctrine_orm_event_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrineOrmEventSubscriber</parameter>
+        <parameter key="ecommerce_core.event_listener.doctrine_phpcr_event_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrinePhpcrEventSubscriber</parameter>
     </parameters>
 
     <services>
-        <service id="ecommerce_core.example" class="%ecommerce_core.example.class%">
-            <argument type="service" id="service_id" />
-            <argument>plain_value</argument>
-            <argument>%parameter_name%</argument>
+
+        <service id="ecommerce_core.product.repository"
+            class="Doctrine\ODM\PHPCR\DocumentRepository"
+            factory-service="doctrine_phpcr.odm.document_manager"
+            factory-method="getRepository">
+            <argument>EcommerceCoreBundle:Product</argument>
         </service>
+
+        <service id="ecommerce_core.product_reference.repository"
+            class="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository"
+            factory-service="doctrine"
+            factory-method="getRepository">
+            <argument>EcommerceCoreBundle:ProductReference</argument>
+        </service>
+
+        <service id="ecommerce_core.deu.repository"
+            class="Doctrine\ORM\EntityRepository"
+            factory-service="doctrine"
+            factory-method="getRepository">
+            <argument>EcommerceCoreBundle:Product</argument>
+        </service>
+
+        <service id="ecommerce_core.event_listener.doctrine_phpcr_event_subscriber"
+            class="%ecommerce_core.event_listener.doctrine_phpcr_event_subscriber.class%">
+            <argument type="service" id="service_container" />
+            <tag name="doctrine_phpcr.event_subscriber" />
+        </service>
+
+        <service id="ecommerce_core.product.manager" class="%ecommerce_core.product.manager.class%">
+            <argument type="service" id="doctrine_phpcr.odm.document_manager" />
+            <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
+            <argument type="service" id="service_container" />
+        </service>
+
+        <!--<service id="ecommerce_core.event_listener.doctrine_orm_event_subscriber"
+            class="%ecommerce_core.event_listener.doctrine_orm_event_subscriber.class%">
+            <argument type="service" id="service_container" />
+            <tag name="doctrine.event_subscriber" />
+        </service>-->
+
+        <!--<service id="ecommerce_core.event_listener.doctrine_phpcr_event_subscriber"
+            class="%ecommerce_core.event_listener.doctrine_phpcr_event_subscriber.class%">
+            <argument type="service" id="service_container" />
+            <tag name="doctrine_phpcr.event_subscriber" />
+        </service>-->
+
+
+
     </services>
-    -->
 </container>

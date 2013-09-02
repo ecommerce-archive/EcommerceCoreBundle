@@ -1,0 +1,24 @@
+{
+    "name": "ecommerce/core-bundle",
+    "type": "symfony-bundle",
+    "description": "Ecommerce Core Bundle",
+    "keywords": ["ecommerce"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name":"Philipp Wahala",
+            "email":"philipp.wahala@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/framework-bundle": "~2.2",
+        "jackalope/jackalope-doctrine-dbal": "1.0.0-beta3"
+    },
+    "autoload":{
+        "psr-0":{
+            "Ecommerce\\Bundle\\CoreBundle": ""
+        }
+    },
+    "target-dir": "Ecommerce/Bundle/CoreBundle"
+}

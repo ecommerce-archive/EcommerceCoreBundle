@@ -23,6 +23,11 @@ class ProductHandlersPass implements CompilerPassInterface
         ksort($productHandlers);
 
         $container->getDefinition('ecommerce_core.product.handler_manager')->replaceArgument(0, array_values($productHandlers));
-        $container->setParameter('ecommerce_core.product_handlers', $productHandlers);
+
+        $productHandlerIds = array();
+        foreach ($productHandlers as $productHandler) {
+            $productHandlerIds[] = strval($productHandler);
+        }
+        $container->setParameter('ecommerce_core.product_handlers', $productHandlerIds);
     }
 }

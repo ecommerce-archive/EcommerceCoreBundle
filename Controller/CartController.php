@@ -46,7 +46,7 @@ class CartController extends Controller
             throw new \Exception('Wrong request method');
         }
 
-        if (null === ($productId = $request->request->get('product_id'))) {
+        if (null === ($productId = $request->request->get('product_id')) || !$productId) {
             throw new \Exception('No product id provided');
         }
 
@@ -64,7 +64,7 @@ class CartController extends Controller
             throw new \Exception('Product not found');
         }
 
-        $options = $request->request->get('options');
+        $options = $request->request->get('option');
 
 //        $productTypeManager = $this->get('ecommerce_core.product.type_manager');
         /** @var HandlerManager $productHandlerManager */

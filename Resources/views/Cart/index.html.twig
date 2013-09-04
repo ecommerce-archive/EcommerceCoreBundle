@@ -2,6 +2,21 @@
 
 {% block body %}
 
+  {% set flashBag = app.session.flashbag.all() %}
+  {% if flashBag|length > 0 %}
+    <div class="notifications">
+    {% for type, flashMessages in flashBag %}
+      {% for flashMessage in flashMessages -%}
+        <div class="alert alert-{{ type }}">
+          {{ flashMessage }}
+        </div>
+
+      {% endfor %}
+    {% endfor %}
+    </div>
+  {% endif %}
+
+
   <div>
   {% if cart %}
 

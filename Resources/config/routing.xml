@@ -28,4 +28,17 @@
         <default key="_controller">EcommerceCoreBundle:Sandbox:delete</default>
     </route>
 
+    <route id="ecommerce_cart" pattern="/cart/" methods="GET">
+        <default key="_controller">EcommerceCoreBundle:Cart:index</default>
+    </route>
+
+    <route id="ecommerce_cart_add_product" pattern="/cart/" methods="POST">
+        <default key="_controller">EcommerceCoreBundle:Cart:addProduct</default>
+    </route>
+
+    <route id="ecommerce_cart_item_remove" pattern="/cart/{cartItemId}" methods="DELETE">
+        <default key="_controller">EcommerceCoreBundle:Cart:removeCartItem</default>
+        <requirement key="cartItemId">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
+    </route>
+
 </routes>

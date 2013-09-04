@@ -15,4 +15,12 @@ class CartRepository extends EntityRepository
 
         return $cart;
     }
+
+    public function save(Cart $cart)
+    {
+        $this->_em->persist($cart);
+        $this->_em->flush();
+
+        return $cart;
+    }
 }

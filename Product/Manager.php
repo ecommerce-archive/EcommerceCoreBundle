@@ -34,8 +34,8 @@ class Manager
      */
     public function __construct(DocumentManager $dm, $basepath, ContainerInterface $container)
     {
-        $this->dm = $dm;
-        $this->basepath = $basepath;
+        $this->dm        = $dm;
+        $this->basepath  = $basepath;
         $this->container = $container;
     }
 

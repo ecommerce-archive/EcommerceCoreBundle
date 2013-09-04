@@ -1,0 +1,71 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+
+  <div>
+  {% if cart %}
+
+    {{ cart.id }}
+
+    <ul>
+
+    {% for item in cart.items %}
+      <li>
+        {{ item.id }}
+          - {{ item.product.id }}
+          <ol>
+            {#
+            {% for key, property in item.product.properties.node.getPropertiesValues %}
+              <li>{{ key }} {{property|join(', ') }}</li>
+            {% endfor %}
+            #}
+          </ol>
+
+
+        <form action="{{ path('ecommerce_cart_item_remove', { 'cartItemId': item.id }) }}" method="post">
+          <input type="hidden" name="_method" value="DELETE" />
+          <button type="submit">x</button>
+        </form>
+      </li>
+    {% endfor %}
+    </ul>
+
+  {% else %}
+    No cart yet
+  {% endif %}
+  </div>
+
+  <form action="{{ path('ecommerce_cart_add_product') }}" method="post">
+    {#<input type="hidden" name="product_id" value="84e46665-c2a0-4e10-9d60-cef7ed9ba47f" />#}
+    <label>Product:</label>
+    {% if products|length >0  %}
+    <select name="product_id">
+      <option value="">Product auswählen</option>
+      {% for product in products %}
+      <option value="{{ product.getIdentifier() }}">{{ product.name }}</option>
+      {% endfor %}
+    {% else %}
+    </select>
+    {% endif %}
+    <br />
+    <select name="option[size]">
+      <option value="">Wählen</option>
+      <option value="36">36</option>
+      <option value="38">38</option>
+      <option value="40">40</option>
+    </select><br />
+    <select name="option[backup]">
+      <option value="">Nein, danke</option>
+      <option value="36">36</option>
+      <option value="38">38</option>
+      <option value="40">40</option>
+    </select><br />
+    Mietdauer:
+    <input type="radio" name="option[rental_duration]" value="4" checked="checked" /> 4 -
+    <input type="radio" name="option[rental_duration]" value="8" /> 8
+    <br />
+    <input type="text" name="option[rental_date]" value="{{ "now"|date_modify("+3 days")|date('d.m.Y') }}" />
+    <button type="submit">Go</button>
+  </form>
+
+{% endblock %}

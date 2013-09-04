@@ -16,6 +16,7 @@
         <parameter key="ecommerce_core.event_listener.doctrine_phpcr_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrinePhpcrSubscriber</parameter>
         <parameter key="ecommerce_core.cart.manager.class">Ecommerce\Bundle\CoreBundle\Cart\Manager</parameter>
         <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
+        <parameter key="ecommerce_core.product.handler_manager.class">Ecommerce\Bundle\CoreBundle\Product\HandlerManager</parameter>
         <!--<parameter key="ecommerce_core.cart.session_storage_key">_ecommerce_cart_id</parameter>-->
     </parameters>
 
@@ -71,6 +72,11 @@
             <argument type="service" id="doctrine_phpcr.odm.document_manager" />
             <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
             <argument type="service" id="service_container" />
+        </service>
+
+        <service id="ecommerce_core.product.handler_manager" class="%ecommerce_core.product.handler_manager.class%">
+            <argument>%ecommerce_core.product_handlers%</argument>
+            <!--<argument type="service" id="ecommerce_core.product_handlers" />-->
         </service>
 
         <service id="ecommerce_core.initializer" class="Doctrine\Bundle\PHPCRBundle\Initializer\GenericInitializer">

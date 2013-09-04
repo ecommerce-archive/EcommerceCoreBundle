@@ -59,12 +59,20 @@ class CartController extends Controller
 
         $product = $productManager->find($productId);
 
-        $productHandlerManager = $this->get('ecommerce.product.handler_manager');
+        if (!$product) {
+            throw new \Exception('Product not found');
+        }
+
+        $options = $request->request->get('options');
+
+        $productTypeManager = $this->get('ecommerce_core.product.type_manager');
+
 
         // @TODO: event cart pre add item
 
+
         try {
-            $cartItem = $productHandlerManager->resolveCartItem($product, $request);
+            $cartItem = $productTypeManager->resolveCartItem($product, $options);
 
             if ($cartItem instanceof CartItem) {
 

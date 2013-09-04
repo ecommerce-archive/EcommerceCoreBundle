@@ -74,10 +74,12 @@ class Manager
         return $product;
     }
 
-    public function save(Product $product)
+    public function save(Product $product = null)
     {
         try {
-            $this->dm->persist($product);
+            if ($product) {
+                $this->dm->persist($product);
+            }
             $this->dm->flush();
 
             return true;

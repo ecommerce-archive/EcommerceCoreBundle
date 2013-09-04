@@ -4,39 +4,39 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
-    <route id="ecommerce_core_homepage" pattern="/sandbox">
+    <route id="ecommerce_core_homepage" path="/sandbox">
         <default key="_controller">EcommerceCoreBundle:Sandbox:index</default>
     </route>
 
-    <route id="ecommerce_products" pattern="/products/" methods="GET">
+    <route id="ecommerce_products" path="/products/" methods="GET">
         <default key="_controller">EcommerceCoreBundle:Sandbox:index</default>
     </route>
 
-    <route id="ecommerce_product_create" pattern="/products/" methods="POST">
+    <route id="ecommerce_product_create" path="/products/" methods="POST">
         <default key="_controller">EcommerceCoreBundle:Sandbox:create</default>
     </route>
 
-    <route id="ecommerce_product_view" pattern="/products/{id}" methods="GET">
+    <route id="ecommerce_product_view" path="/products/{id}" methods="GET">
         <default key="_controller">EcommerceCoreBundle:Sandbox:view</default>
     </route>
 
-    <route id="ecommerce_product_update" pattern="/products/{id}" methods="PUT">
+    <route id="ecommerce_product_update" path="/products/{id}" methods="PUT">
         <default key="_controller">EcommerceCoreBundle:Sandbox:update</default>
     </route>
 
-    <route id="ecommerce_product_delete" pattern="/products/{id}" methods="DELETE">
+    <route id="ecommerce_product_delete" path="/products/{id}" methods="DELETE">
         <default key="_controller">EcommerceCoreBundle:Sandbox:delete</default>
     </route>
 
-    <route id="ecommerce_cart" pattern="/cart/" methods="GET">
+    <route id="ecommerce_cart" path="/cart/" methods="GET">
         <default key="_controller">EcommerceCoreBundle:Cart:index</default>
     </route>
 
-    <route id="ecommerce_cart_add_product" pattern="/cart/" methods="POST">
+    <route id="ecommerce_cart_add_product" path="/cart/" methods="POST">
         <default key="_controller">EcommerceCoreBundle:Cart:addProduct</default>
     </route>
 
-    <route id="ecommerce_cart_item_remove" pattern="/cart/{cartItemId}" methods="DELETE">
+    <route id="ecommerce_cart_item_remove" path="/cart/{cartItemId}" methods="DELETE">
         <default key="_controller">EcommerceCoreBundle:Cart:removeCartItem</default>
         <requirement key="cartItemId">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
     </route>

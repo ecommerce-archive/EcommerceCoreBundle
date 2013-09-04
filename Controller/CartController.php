@@ -94,8 +94,6 @@ class CartController extends Controller
                 $cartItem->setCart($cart);
 
                 $cartManager->save();
-//                $em->persist($cartItem);
-//                $em->flush();
 
                 $request->getSession()->getFlashBag()->add(
                     'success',

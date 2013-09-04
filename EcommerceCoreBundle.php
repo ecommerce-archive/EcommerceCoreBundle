@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Doctrine\Bundle\PHPCRBundle\DependencyInjection\Compiler\DoctrinePhpcrMappingsPass;
 
-use Ecommerce\Bundle\CoreBundle\DependencyInjection\Compiler\ProductHandlersPass;
+use Ecommerce\Bundle\CoreBundle\DependencyInjection\CompilerPass\ProductHandlersPass;
 
 class EcommerceCoreBundle extends Bundle
 {

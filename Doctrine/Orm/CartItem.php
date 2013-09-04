@@ -4,58 +4,41 @@ namespace Ecommerce\Bundle\CoreBundle\Doctrine\Orm;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItemRepository")
- * @ORM\Table(name="ecommerce_cart_item")
- */
 class CartItem
 {
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="id", type="string", length=36)
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="UUID")
-     */
+    /** @var string */
     private $id;
 
-    /**
-     * @var Cart
-     *
-     * @ORM\ManyToOne(targetEntity="Cart", inversedBy="items")
-     * @ORM\JoinColumn(name="cart_id", referencedColumnName="id", nullable=false)
-     */
+    /** @var Cart */
     private $cart;
 
-    /**
-     * @var ProductReference
-     *
-     * @ORM\ManyToOne(targetEntity="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference")
-     * @ORM\JoinColumn(name="product_id", referencedColumnName="id", nullable=true)
-     */
+    /** @var ProductReference */
     private $product;
 
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="options", type="array")
-     */
+    /** @var array */
     private $options;
 
-    /**
-     * @var float
-     *
-     * @ORM\Column(name="price", type="decimal", precision=6, scale=2, nullable=true)
-     */
+    /** @var float */
     private $price;
 
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="sort_order", type="smallint", nullable=true)
-     */
+    /** @var integer */
     private $sortOrder;
 
+    /** @var \DateTime */
+    private $createdAt;
+
+    /** @var \DateTime */
+    private $updatedAt;
+
+
+    /**
+     * Constructor.
+     */
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
+    }
 
     /**
      * @return integer
@@ -79,7 +62,6 @@ class CartItem
 
         $this->cart = $cart;
 
-
         return $this;
     }
 
@@ -97,7 +79,7 @@ class CartItem
      * @param ProductReference $product
      * @return CartItem
      */
-    public function setProduct(Product $product = null)
+    public function setProduct(ProductReference $product = null)
     {
         $this->product = $product;
 
@@ -174,5 +156,45 @@ class CartItem
     public function getSortOrder()
     {
         return $this->sortOrder;
+    }
+
+
+    /**
+     * @param \DateTime|null $createdAt
+     * @return CartItem
+     */
+    public function setCreatedAt(\DateTime $createdAt = null)
+    {
+        $this->createdAt = $createdAt instanceof \DateTime ? $createdAt : new \DateTime();
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+
+    /**
+     * @param \DateTime|null $updatedAt
+     * @return CartItem
+     */
+    public function setUpdatedAt(\DateTime $updatedAt = null)
+    {
+        $this->updatedAt = $updatedAt instanceof \DateTime ? $updatedAt : new \DateTime();
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
     }
 }

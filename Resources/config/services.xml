@@ -5,14 +5,40 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="ecommerce_core.product.class">Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product</parameter>
+        <parameter key="ecommerce_core.cart.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart</parameter>
+        <parameter key="ecommerce_core.cart.repository.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartRepository</parameter>
+        <parameter key="ecommerce_core.cart_item.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem</parameter>
+        <parameter key="ecommerce_core.cart_item.repository.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItemRepository</parameter>
         <parameter key="ecommerce_core.product_reference.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference</parameter>
-        <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
+        <parameter key="ecommerce_core.product_reference.repository.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository</parameter>
+        <parameter key="ecommerce_core.product.class">Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product</parameter>
         <parameter key="ecommerce_core.event_listener.doctrine_orm_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrineOrmSubscriber</parameter>
         <parameter key="ecommerce_core.event_listener.doctrine_phpcr_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrinePhpcrSubscriber</parameter>
+        <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
     </parameters>
 
     <services>
+
+        <service id="ecommerce_core.cart.repository"
+            class="%ecommerce_core.product_reference.repository.class%"
+            factory-service="doctrine"
+            factory-method="getRepository">
+            <argument>%ecommerce_core.cart.class%</argument>
+        </service>
+
+        <service id="ecommerce_core.cart_item.repository"
+            class="%ecommerce_core.cart_item.repository.class%"
+            factory-service="doctrine"
+            factory-method="getRepository">
+            <argument>%ecommerce_core.cart_item.class%</argument>
+        </service>
+
+        <service id="ecommerce_core.product_reference.repository"
+            class="%ecommerce_core.product_reference.repository.class%"
+            factory-service="doctrine"
+            factory-method="getRepository">
+            <argument>%ecommerce_core.product_reference.class%</argument>
+        </service>
 
         <service id="ecommerce_core.product.repository"
             class="Doctrine\ODM\PHPCR\DocumentRepository"
@@ -21,24 +47,16 @@
             <argument>%ecommerce_core.product.class%</argument>
         </service>
 
-        <service id="ecommerce_core.product_reference.repository"
-            class="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository"
-            factory-service="doctrine"
-            factory-method="getRepository">
-            <argument>%ecommerce_core.product_reference.class%</argument>
-        </service>
-
-        <!--<service id="ecommerce_core.deu.repository"
-            class="Doctrine\ORM\EntityRepository"
-            factory-service="doctrine"
-            factory-method="getRepository">
-            <argument>EcommerceCoreBundle:Product</argument>
-        </service>-->
-
         <service id="ecommerce_core.event_listener.doctrine_phpcr_subscriber"
             class="%ecommerce_core.event_listener.doctrine_phpcr_subscriber.class%">
             <argument type="service" id="service_container" />
             <tag name="doctrine_phpcr.event_subscriber" />
+        </service>
+
+        <service id="ecommerce_core.event_listener.doctrine_orm_subscriber"
+            class="%ecommerce_core.event_listener.doctrine_orm_subscriber.class%">
+            <argument type="service" id="service_container" />
+            <tag name="doctrine.event_subscriber" />
         </service>
 
         <service id="ecommerce_core.product.manager" class="%ecommerce_core.product.manager.class%">
@@ -46,20 +64,6 @@
             <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
             <argument type="service" id="service_container" />
         </service>
-
-        <!--<service id="ecommerce_core.event_listener.doctrine_orm_subscriber"
-            class="%ecommerce_core.event_listener.doctrine_orm_subscriber.class%">
-            <argument type="service" id="service_container" />
-            <tag name="doctrine.event_subscriber" />
-        </service>-->
-
-        <!--<service id="ecommerce_core.event_listener.doctrine_phpcr_event_subscriber"
-            class="%ecommerce_core.event_listener.doctrine_phpcr_event_subscriber.class%">
-            <argument type="service" id="service_container" />
-            <tag name="doctrine_phpcr.event_subscriber" />
-        </service>-->
-
-
 
     </services>
 </container>

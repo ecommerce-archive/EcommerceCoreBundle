@@ -52,7 +52,6 @@ class Cart
     }
 
 
-
     /**
      * @return string
      */
@@ -178,7 +177,6 @@ class Cart
 
     /**
      * @param \DateTime|null $createdAt
-     *
      * @return Cart
      */
     public function setCreatedAt(\DateTime $createdAt = null)

@@ -18,13 +18,6 @@ class DoctrineOrmSubscriber implements EventSubscriber
      */
     protected $container;
 
-    /**
-     * @var ProductManager
-     */
-    protected $productManager;
-
-    protected $document;
-
 
     /**
      * Constructor.
@@ -40,8 +33,8 @@ class DoctrineOrmSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return array(
-            'prePersist',
-            'postPersist',
+//            'prePersist',
+//            'preUpdate',
         );
     }
 
@@ -49,31 +42,10 @@ class DoctrineOrmSubscriber implements EventSubscriber
     public function prePersist(LifecycleEventArgs $args)
     {
         $entity = $args->getEntity();
+        $em = $args->getEntityManager();
 
-        if ($entity instanceof Product) {
-            if (null === $entity->getProperties()) {
-                $this->document = $this->getProductManager()->autocreatePropertiesDocument($entity);
-            } elseif ($entity->getProperties()->getProduct() !== $entity) {
-                $this->document = $entity->getProperties();
-            }
-
+        if ($entity instanceof Cart) {
             return;
-        }
-//        if ($entity instanceof ProductCategoryMapping) {
-//            $em = $args->getEntityManager();
-//            $entity;
-//        }
-    }
-
-
-    public function postPersist(LifecycleEventArgs $args)
-    {
-        $entity = $args->getEntity();
-
-        if ($entity instanceof Product) {
-            if ($this->document instanceof ProductProperties) {
-                $this->getProductManager()->setProductPropertiesEntityReference($entity, $this->document);
-            }
         }
     }
 
@@ -81,23 +53,6 @@ class DoctrineOrmSubscriber implements EventSubscriber
     public function preUpdate(PreUpdateEventArgs $args)
     {
         $entity = $args->getEntity();
-
         $changes = $args->getEntityChangeSet();
-    }
-
-
-    public function postUpdate(LifecycleEventArgs $args)
-    {
-    }
-
-    protected function getProductManager()
-    {
-        if (null !== $this->productManager) {
-            return $this->productManager;
-        }
-
-        $this->productManager = $this->container->get('glamour_rent_app.product_manager');
-
-        return $this->productManager;
     }
 }

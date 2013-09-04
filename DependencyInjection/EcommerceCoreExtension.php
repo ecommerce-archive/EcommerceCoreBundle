@@ -18,8 +18,6 @@ class EcommerceCoreExtension extends Extension
         $loader->load('services.xml');
 
         $this->loadPhpcr($config['persistence']['phpcr'], $loader, $container);
-
-
     }
 
     public function loadPhpcr($config, XmlFileLoader $loader, ContainerBuilder $container)

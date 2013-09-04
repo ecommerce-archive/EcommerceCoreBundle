@@ -5,15 +5,9 @@ namespace Ecommerce\Bundle\CoreBundle\EventListener;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContext;
 
-use Doctrine\Common\Persistence\Event\LoadClassMetadataEventArgs;
-use Doctrine\ODM\PHPCR\Mapping\ClassMetadata;
-
 use Doctrine\Common\EventSubscriber;
 use Doctrine\Common\Persistence\Event\LifecycleEventArgs;
-use Doctrine\Common\Util\ClassUtils;
 
-
-//use GlamourRent\AppBundle\Form\DataMapper\PreparedPropertyAccessor;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
 
 class DoctrinePhpcrSubscriber implements EventSubscriber
@@ -44,61 +38,10 @@ class DoctrinePhpcrSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return array(
-//            'loadClassMetadata',
             'postPersist',
             'preUpdate',
             'preRemove',
         );
-    }
-
-    public function loadClassMetadata(LoadClassMetadataEventArgs $args)
-    {
-
-        $dm = $args->getObjectManager();
-
-        /** @var ClassMetadata $classMetadata */
-        $classMetadata = $args->getClassMetadata();
-
-        if ($classMetadata->getName() !== 'GlamourRent\AppBundle\Doctrine\Phpcr\ProductProperties') {
-            return;
-        }
-
-        foreach (array('name', 'desc') as $fieldName) {
-
-            $field = array(
-                'fieldName'  => $fieldName,
-                'type'       => 'string',
-                'translated' => true,
-                'name'       => null,
-                'property'   => $fieldName,
-                'multivalue' => false,
-                'assoc'      => null,
-                'nullable'   => true,
-            );
-
-            $classMetadata->mappings[$fieldName] = $field;
-
-            $locale = $dm->getLocaleChooserStrategy()->getLocale();
-
-            $fakeReflectionProperty = new PreparedPropertyAccessor($fieldName, $locale);
-
-            $classMetadata->reflFields[$fieldName] = $fakeReflectionProperty;
-
-            $classMetadata->translatableFields[] = $fieldName;
-        }
-    }
-
-    public function preUpdate(LifecycleEventArgs $args)
-    {
-        $document = $args->getObject();
-
-        if ($document instanceof Product) {
-
-            $userId = $this->getUserId();
-            if ($userId) {
-                $document->node->setProperty('jcr:lastModifiedBy', $this->getUserId());
-            }
-        }
     }
 
     public function postPersist(LifecycleEventArgs $args)
@@ -109,9 +52,20 @@ class DoctrinePhpcrSubscriber implements EventSubscriber
 
             $this->container->get('ecommerce_core.product_reference.repository')->create($document);
 
-            $userId = $this->getUserId();
-            if ($userId) {
+            if ($userId = $this->getUserId()) {
                 $document->node->setProperty('jcr:createdBy', $this->getUserId());
+                $document->node->setProperty('jcr:lastModifiedBy', $this->getUserId());
+            }
+        }
+    }
+
+    public function preUpdate(LifecycleEventArgs $args)
+    {
+        $document = $args->getObject();
+
+        if ($document instanceof Product) {
+
+            if ($userId = $this->getUserId()) {
                 $document->node->setProperty('jcr:lastModifiedBy', $this->getUserId());
             }
         }
@@ -149,5 +103,4 @@ class DoctrinePhpcrSubscriber implements EventSubscriber
 
         return $this->userId = $user->getId();
     }
-
 }

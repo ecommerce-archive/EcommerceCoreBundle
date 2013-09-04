@@ -10,6 +10,6 @@
             <generator strategy="UUID" />
         </id>-->
 
-        <field name="name" type="string" column="name" length="255" />
+        <field name="name" type="string" column="name" length="255" nullable="true" />
     </entity>
 </doctrine-mapping>

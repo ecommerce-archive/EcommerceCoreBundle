@@ -2,37 +2,28 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Doctrine\Orm;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * ProductReference
- */
 class ProductReference
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $id;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $name;
-
 
 
     /**
      * Constructor.
+     *
+     * @param string      $id
+     * @param string|null $name
      */
-    public function __construct($id, $name)
+    public function __construct($id, $name = null)
     {
         $this->id = $id;
         $this->name = $name;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getId()
     {
         return $this->id;
@@ -49,9 +40,7 @@ class ProductReference
         return $this;
     }
 
-    /**
-     * @return string
-     */
+    /** @return string */
     public function getName()
     {
         return $this->name;

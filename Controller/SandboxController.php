@@ -3,12 +3,12 @@
 namespace Ecommerce\Bundle\CoreBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use Doctrine\ODM\PHPCR\DocumentManager;
 
 use Ecommerce\Bundle\CoreBundle\Product\Manager;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class SandboxController extends Controller
 {

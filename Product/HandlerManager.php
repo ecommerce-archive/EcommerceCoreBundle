@@ -67,8 +67,9 @@ class HandlerManager
             }
 
             try {
-                $cartHandler = $productHandler->getCartHandler($product);
-                $result = $cartHandler->processRequest($product, $options);
+//                $cartHandler = $productHandler->getCartHandler($product);
+//                $result = $cartHandler->processRequest($product, $options);
+                $result = $productHandler->createCartItem($product, $options);
 
                 if (null !== $result) {
                     break;

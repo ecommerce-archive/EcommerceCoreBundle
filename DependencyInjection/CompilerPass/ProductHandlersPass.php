@@ -16,14 +16,13 @@ class ProductHandlersPass implements CompilerPassInterface
         $productHandlers = new \SplPriorityQueue();
         foreach ($container->findTaggedServiceIds('ecommmerce.product_handler') as $id => $attributes) {
             $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $productHandlers->insert($id, $priority);
-//            $productHandlers->insert(new Reference($id), $priority);
+            $productHandlers->insert(new Reference($id), $priority);
         }
 
         $productHandlers = iterator_to_array($productHandlers);
         ksort($productHandlers);
 
-//        $container->getDefinition('ecommerce.product.handler_manager')->replaceArgument(0, array_values($productHandlers));
+        $container->getDefinition('ecommerce_core.product.handler_manager')->replaceArgument(0, array_values($productHandlers));
         $container->setParameter('ecommerce_core.product_handlers', $productHandlers);
     }
 }

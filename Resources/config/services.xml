@@ -75,7 +75,7 @@
         </service>
 
         <service id="ecommerce_core.product.handler_manager" class="%ecommerce_core.product.handler_manager.class%">
-            <argument>%ecommerce_core.product_handlers%</argument>
+            <argument type="collection"/>
             <!--<argument type="service" id="ecommerce_core.product_handlers" />-->
         </service>
 

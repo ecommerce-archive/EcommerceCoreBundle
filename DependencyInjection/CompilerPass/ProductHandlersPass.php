@@ -1,6 +1,6 @@
 <?php
 
-namespace Ecommerce\Bundle\CoreBundle\DependencyInjection\Compiler;
+namespace Ecommerce\Bundle\CoreBundle\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Criteria;
 
 use Ecommerce\Bundle\CoreBundle\Cart\Manager as CartManager;
 use Ecommerce\Bundle\CoreBundle\Product\Manager as ProductManager;
+use Ecommerce\Bundle\CoreBundle\Product\HandlerManager;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem;
 
@@ -65,14 +66,16 @@ class CartController extends Controller
 
         $options = $request->request->get('options');
 
-        $productTypeManager = $this->get('ecommerce_core.product.type_manager');
+//        $productTypeManager = $this->get('ecommerce_core.product.type_manager');
+        /** @var HandlerManager $productHandlerManager */
+        $productHandlerManager = $this->get('ecommerce_core.product.handler_manager');
 
 
         // @TODO: event cart pre add item
 
 
         try {
-            $cartItem = $productTypeManager->resolveCartItem($product, $options);
+            $cartItem = $productHandlerManager->resolveCartItem($product, $options);
 
             if ($cartItem instanceof CartItem) {
 

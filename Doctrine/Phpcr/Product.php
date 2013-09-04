@@ -204,7 +204,7 @@ class Product
 
     public function getProductReference()
     {
-        return $this->product;
+        return $this->productReference;
     }
 
 

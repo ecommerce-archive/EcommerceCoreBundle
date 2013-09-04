@@ -18,6 +18,18 @@ class ProductReferenceRepository extends EntityRepository
         return $productReference;
     }
 
+    public function findOrCreate(Product $product)
+    {
+        $productReference = $this->find($product->getIdentifier());
+
+        if ($productReference) {
+            return $productReference;
+        }
+
+        // @TODO: Log as this shouldn’t happen
+        return $this->create($product);
+    }
+
     public function getReference($productId)
     {
 //        $productReference = $this->find($product->getIdentifier());

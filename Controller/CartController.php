@@ -68,14 +68,13 @@ class CartController extends Controller
         /** @var ProductReferenceRepository $productReferenceRepo */
         $productReferenceRepo = $this->get('ecommerce_core.product_reference.repository');
 
-        $productReference = $productReferenceRepo->getReference($product->getIdentifier());
+        $productReference = $productReferenceRepo->findOrCreate($product);
+//        $productReference = $productReferenceRepo->getReference($product->getIdentifier());
         if (!$productReference) {
             throw new \Exception('Product reference not found');
         }
 
-
         $product->setProductReference($productReference);
-//        $productReference->setProduct($productProxy);
 
         $options = $request->request->get('option');
 

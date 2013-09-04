@@ -59,8 +59,9 @@
       {% for product in products %}
       <option value="{{ product.getIdentifier() }}">{{ product.name }}</option>
       {% endfor %}
-    {% else %}
     </select>
+    {% else %}
+      --- no products available ---
     {% endif %}
     <br />
     <select name="option[size]">

@@ -76,10 +76,12 @@ class CartItem
 
 
     /**
-     * @param ProductReference $product
+     * @ param ProductReference $product
+     * @param ProductReference|string $product
      * @return CartItem
      */
-    public function setProduct(ProductReference $product = null)
+//    public function setProduct(ProductReference $product = null)
+    public function setProduct($product = null)
     {
         $this->product = $product;
 

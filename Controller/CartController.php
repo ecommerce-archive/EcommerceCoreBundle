@@ -88,7 +88,7 @@ class CartController extends Controller
 
 
         try {
-            $cartItem = $productHandlerManager->resolveCartItem($productReference, $options);
+            $cartItem = $productHandlerManager->resolveCartItem($product, $options);
 
             if ($cartItem instanceof CartItem) {
 

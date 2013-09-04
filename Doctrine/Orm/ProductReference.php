@@ -10,6 +10,8 @@ class ProductReference
     /** @var string */
     private $name;
 
+    private $product;
+
 
     /**
      * Constructor.
@@ -45,4 +47,18 @@ class ProductReference
     {
         return $this->name;
     }
+
+    public function setProduct($proxy)
+    {
+        $this->product = $proxy;
+
+        return $this;
+    }
+
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+
 }

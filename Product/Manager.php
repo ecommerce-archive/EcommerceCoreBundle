@@ -74,6 +74,16 @@ class Manager
         return $product;
     }
 
+
+    /**
+     * @param string $id
+     * @return null|Product
+     */
+    public function createReference($id)
+    {
+        return $this->dm->getReference('Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product', $id);
+    }
+
     public function save(Product $product = null)
     {
         try {

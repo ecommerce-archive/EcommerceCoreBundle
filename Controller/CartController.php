@@ -14,6 +14,7 @@ use Ecommerce\Bundle\CoreBundle\Product\Manager as ProductManager;
 use Ecommerce\Bundle\CoreBundle\Product\HandlerManager;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem;
+use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository;
 
 class CartController extends Controller
 {
@@ -55,14 +56,24 @@ class CartController extends Controller
 
         $cart = $cartManager->getOrCreateCart();
 
+        /** @var ProductReferenceRepository $productReferenceRepo */
+        $productReferenceRepo = $this->get('ecommerce_core.product_reference.repository');
+
+        $productReference = $productReferenceRepo->find($productId);
+        if (!$productReference) {
+            throw new \Exception('Product reference not found');
+        }
+
         /** @var ProductManager $productManager */
         $productManager = $this->get('ecommerce_core.product.manager');
 
-        $product = $productManager->find($productId);
+//        $product = $productManager->find($productId);
+        $productProxy = $productManager->createReference($productId);
 
-        if (!$product) {
-            throw new \Exception('Product not found');
-        }
+//        if (!$product) {
+//            throw new \Exception('Product not found');
+//        }
+        $productReference->setProduct($productProxy);
 
         $options = $request->request->get('option');
 

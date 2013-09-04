@@ -6,6 +6,8 @@ use Doctrine\ODM\PHPCR\Document\Generic;
 
 use Jackalope\Node;
 
+use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference;
+
 class Product
 {
     const STATUS_CREATED = 0;
@@ -31,6 +33,9 @@ class Product
 
     /** @var Node */
     public $node;
+
+    /** @var ProductReference */
+    private $productReference;
 
 
     public function __construct($locale = 'en')
@@ -189,6 +194,18 @@ class Product
         return $this->node->getProperties();
     }
 
+
+    public function setProductReference($proxy)
+    {
+        $this->productReference = $proxy;
+
+        return $this;
+    }
+
+    public function getProductReference()
+    {
+        return $this->product;
+    }
 
 
     /*

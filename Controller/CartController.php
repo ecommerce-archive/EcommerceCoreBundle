@@ -56,24 +56,26 @@ class CartController extends Controller
 
         $cart = $cartManager->getOrCreateCart();
 
+        /** @var ProductManager $productManager */
+        $productManager = $this->get('ecommerce_core.product.manager');
+
+        $product = $productManager->find($productId);
+
+        if (!$product) {
+            throw new \Exception('Product not found');
+        }
+
         /** @var ProductReferenceRepository $productReferenceRepo */
         $productReferenceRepo = $this->get('ecommerce_core.product_reference.repository');
 
-        $productReference = $productReferenceRepo->find($productId);
+        $productReference = $productReferenceRepo->getReference($product->getIdentifier());
         if (!$productReference) {
             throw new \Exception('Product reference not found');
         }
 
-        /** @var ProductManager $productManager */
-        $productManager = $this->get('ecommerce_core.product.manager');
 
-//        $product = $productManager->find($productId);
-        $productProxy = $productManager->createReference($productId);
-
-//        if (!$product) {
-//            throw new \Exception('Product not found');
-//        }
-        $productReference->setProduct($productProxy);
+        $product->setProductReference($productReference);
+//        $productReference->setProduct($productProxy);
 
         $options = $request->request->get('option');
 
@@ -86,7 +88,7 @@ class CartController extends Controller
 
 
         try {
-            $cartItem = $productHandlerManager->resolveCartItem($product, $options);
+            $cartItem = $productHandlerManager->resolveCartItem($productReference, $options);
 
             if ($cartItem instanceof CartItem) {
 

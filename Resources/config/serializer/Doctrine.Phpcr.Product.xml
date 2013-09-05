@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serializer>
+    <class name="Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product" exclusion-policy="ALL" xml-root-name="product">
+        <property name="id" expose="true" type="string" access-type="public_method" accessor-getter="getIdentifier" read-only="true" groups="all" />
+
+        <property name="name" expose="true" type="string" groups="all" />
+
+        <property name="status" expose="true" type="integer" groups="all" />
+
+        <property name="node"
+            expose="true"
+            type="array"
+            serialized-name="properties"
+
+            access-type="public_method"
+            accessor-getter="getPublicNodeProperties"
+            accessor-setter="set"
+            inline="true"
+            read-only="true"
+            groups="all"
+            xml-attribute-map="true"
+            max-depth="2"
+            >
+            <!--<xml-map inline="true" key-attribute-name="foo" entry-name="bar" />-->
+        </property>
+
+        <!--xml-key-value-pairs="true"-->
+
+        <!--<property name="created_at" xml-attribute="true" type="DateTime" groups="all" />-->
+        <!--<property name="updated_at" type="DateTime" serialized-name="is_published" xml-attribute="true" groups="all" />-->
+        <!--jcr:created-->
+        <!--jcr:lastModified-->
+
+        <!--
+        <property name="comments" groups="comments">
+            <type><![CDATA[ArrayCollection<JMS\Serializer\Tests\Fixtures\Comment>]]></type>
+            <xml-list inline="true" entry-name="comment" />
+        </property>
+        <property name="author" groups="post" type="JMS\Serializer\Tests\Fixtures\Author" />
+        -->
+    </class>
+</serializer>

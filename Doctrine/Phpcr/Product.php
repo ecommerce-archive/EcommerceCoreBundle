@@ -194,6 +194,21 @@ class Product
         return $this->node->getProperties();
     }
 
+    public function getPublicNodeProperties()
+    {
+        $properties = $this->node->getPropertiesValues();
+
+        foreach ($properties as $key => $property) {
+            if (strpos($key, 'jcr:') === 0
+                || strpos($key, 'phpcr:') === 0
+            ) {
+                unset($properties[$key]);
+            }
+        }
+
+        return $properties;
+    }
+
 
     public function setProductReference($proxy)
     {

@@ -32,6 +32,8 @@ Update the database by running (not recommended for production):
     php app/console doctrine:schema:update --force
 
 
-### License: MIT
+### License
 
-See [``Resources/meta/LICENSE``](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Resources/meta/LICENSE) file.
+This bundle is under the MIT license. See the complete license in the bundle:
+
+    [``Resources/meta/LICENSE``](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Resources/meta/LICENSE) file.

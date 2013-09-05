@@ -5,6 +5,9 @@ namespace Ecommerce\Bundle\CoreBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use FOS\RestBundle\View\View;
+use JMS\Serializer\SerializationContext;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\Criteria;
 
@@ -32,13 +35,42 @@ class CartController
 
     public function indexAction(Request $request)
     {
+        $view = View::create();
+
+        $view
+            ->setTemplate("EcommerceCoreBundle:Cart:index.html.twig")
+            ->setTemplateVar('cart')
+            ->setSerializationContext(
+                SerializationContext::create()
+                    ->setGroups(array('cart_index', 'cart', 'frontend', 'all', 'admin'))
+                    ->setSerializeNull(true)
+            )
+        ;
+
+
         $cart = $this->cartManager->getCart();
+
+        $data = array('cart' => $cart);
 
         // @TODO: Cart items availability check
 
         // @TODO: Remove test code
-        $productManager = $this->utils->getProductManager();
-        $products = $productManager->findAll();
+        $data['products'] = $this->utils->getProductManager()->findAll(); //->toArray()
+        $product = $data['products']->first();
+//        $data['products']->initialize();
+//        $product = $data['products'];
+
+        $serializer = $this->utils->get('jms_serializer');
+        $result = $serializer->serialize($product->getNode(), 'json', $view->getSerializationContext());
+
+        echo $result;
+
+
+//        $data = $serializer->deserialize($inputStr, $typeName, $format);
+
+//        $view->setData($cart);
+        $view->setData($data);
+        return $view;
 
         return $this->utils->render(
             'EcommerceCoreBundle:Cart:index.html.twig',

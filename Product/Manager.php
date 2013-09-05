@@ -32,11 +32,10 @@ class Manager
     /**
      * Constructor.
      */
-    public function __construct(DocumentManager $dm, $basepath, ContainerInterface $container)
+    public function __construct(DocumentManager $dm, $basepath)
     {
         $this->dm        = $dm;
         $this->basepath  = $basepath;
-        $this->container = $container;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
@@ -166,6 +165,6 @@ class Manager
             return $this->productNode;
         }
 
-        return $this->productNode = $this->dm->find(null, $this->container->getParameter('ecommerce_core.persistence.phpcr.product_basepath'));
+        return $this->productNode = $this->dm->find(null, $this->basepath);
     }
 }

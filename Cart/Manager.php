@@ -3,32 +3,27 @@
 namespace Ecommerce\Bundle\CoreBundle\Cart;
 
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartRepository;
 
 class Manager
 {
+    /** @var CartRepository */
+    private $cartRepository;
 
-    /**
-     * @var CartRepository
-     */
-    protected $cartRepository;
+    /** @var Session */
+    private $session;
 
-    /**
-     * @var Session
-     */
-    protected $session;
+    /** @var string */
+    private $storageKey;
 
-    /**
-     * @var string
-     */
-    protected $storageKey;
+    /** @var EventDispatcherInterface */
+    private $eventDispatcher;
 
-    /**
-     * @var Cart
-     */
-    protected $cart;
+    /** @var Cart */
+    private $cart;
 
 
 
@@ -40,6 +35,11 @@ class Manager
         $this->cartRepository = $cartRepository;
         $this->session        = $session;
         $this->storageKey     = $storageKey;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->eventDispatcher = $dispatcher;
     }
 
 
@@ -92,6 +92,12 @@ class Manager
         return $cart;
     }
 
+    /**
+     * Save the current cart
+     *
+     * @throws \Exception
+     * @return Cart
+     */
     public function save()
     {
         if (null === ($cart = $this->getCart())) {
@@ -99,6 +105,17 @@ class Manager
         }
 
         return $this->cartRepository->save($cart);
+    }
+
+
+    /**
+     * Delete a cart
+     *
+     * @return bool
+     */
+    public function delete(Cart $cart)
+    {
+        return $this->cartRepository->delete($cart);
     }
 
 

@@ -2,8 +2,8 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Product;
 
-use PHPCR\Util\NodeHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\ODM\PHPCR\DocumentManager;
 use Doctrine\ODM\PHPCR\Document\Generic;
@@ -37,6 +37,11 @@ class Manager
         $this->dm        = $dm;
         $this->basepath  = $basepath;
         $this->container = $container;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->eventDispatcher = $dispatcher;
     }
 
 

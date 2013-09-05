@@ -10,17 +10,37 @@ class CartRepository extends EntityRepository
     {
         $cart = new Cart();
 
-        $this->_em->persist($cart);
-        $this->_em->flush();
+        try {
+            $this->_em->persist($cart);
+            $this->_em->flush();
 
-        return $cart;
+            return $cart;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function save(Cart $cart)
     {
-        $this->_em->persist($cart);
-        $this->_em->flush();
+        try {
+            $this->_em->persist($cart);
+            $this->_em->flush();
 
-        return $cart;
+            return $cart;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function delete(Cart $cart)
+    {
+        try {
+            $this->_em->remove($cart);
+            $this->_em->flush();
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 }

@@ -2,36 +2,45 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Collections\Criteria;
 
+use Ecommerce\Bundle\CoreBundle\Util\ControllerUtils;
 use Ecommerce\Bundle\CoreBundle\Cart\Manager as CartManager;
-use Ecommerce\Bundle\CoreBundle\Product\Manager as ProductManager;
 use Ecommerce\Bundle\CoreBundle\Product\HandlerManager;
-use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository;
 
-class CartController extends Controller
+class CartController
 {
+    /** @var ControllerUtils */
+    private $utils;
+
+    /** @var CartManager */
+    private $cartManager;
+
+
+    function __construct(ControllerUtils $utils, CartManager $cartManager)
+    {
+        $this->utils = $utils;
+        $this->cartManager = $cartManager;
+    }
+
+
     public function indexAction(Request $request)
     {
-        /** @var CartManager $cartManager */
-        $cartManager = $this->get('ecommerce_core.cart.manager');
+        $cart = $this->cartManager->getCart();
 
-        $cart = $cartManager->getCart();
+        // @TODO: Cart items availability check
 
-        // @TODO: Cart items validation
-
-        /** @var ProductManager $productManager */
-        $productManager = $this->get('ecommerce_core.product.manager');
+        // @TODO: Remove test code
+        $productManager = $this->utils->getProductManager();
         $products = $productManager->findAll();
 
-        return $this->render(
+        return $this->utils->render(
             'EcommerceCoreBundle:Cart:index.html.twig',
             array(
                 'cart' => $cart,
@@ -41,23 +50,43 @@ class CartController extends Controller
     }
 
 
-    public function addProductAction(Request $request)
+    public function clearCartAction(Request $request)
     {
-        if (!$request->isMethod('POST')) {
+        if (!$request->isMethod('DELETE')) {
             throw new \Exception('Wrong request method');
         }
 
-        if (null === ($productId = $request->request->get('product_id')) || !$productId) {
+        $cart = $this->cartManager->getCart();
+
+        if ($cart) {
+            $this->cartManager->delete($cart);
+            $cart = null;
+        }
+
+        // @TODO: Move into cart manager event
+        $request->getSession()->getFlashBag()->add('success', 'The cart was successfully cleared');
+
+        if ($referer = $request->headers->get('Referer')) {
+            return $this->utils->redirect($referer);
+        }
+
+        return $this->utils->redirect($this->utils->generateUrl('ecommerce_cart'));
+
+        $response = new Response();
+        $response->setStatusCode(204);
+        return $response;
+    }
+
+
+    public function addProductAction(Request $request)
+    {
+        if (!$productId = $request->request->get('product_id')) {
             throw new \Exception('No product id provided');
         }
 
-        /** @var CartManager $cartManager */
-        $cartManager = $this->get('ecommerce_core.cart.manager');
+        $cart = $this->cartManager->getOrCreateCart();
 
-        $cart = $cartManager->getOrCreateCart();
-
-        /** @var ProductManager $productManager */
-        $productManager = $this->get('ecommerce_core.product.manager');
+        $productManager = $this->utils->getProductManager();
 
         $product = $productManager->find($productId);
 
@@ -66,7 +95,7 @@ class CartController extends Controller
         }
 
         /** @var ProductReferenceRepository $productReferenceRepo */
-        $productReferenceRepo = $this->get('ecommerce_core.product_reference.repository');
+        $productReferenceRepo = $this->utils->get('ecommerce_core.product_reference.repository');
 
         $productReference = $productReferenceRepo->findOrCreate($product);
 //        $productReference = $productReferenceRepo->getReference($product->getIdentifier());
@@ -80,11 +109,10 @@ class CartController extends Controller
 
 //        $productTypeManager = $this->get('ecommerce_core.product.type_manager');
         /** @var HandlerManager $productHandlerManager */
-        $productHandlerManager = $this->get('ecommerce_core.product.handler_manager');
+        $productHandlerManager = $this->utils->get('ecommerce_core.product.handler_manager');
 
 
         // @TODO: event cart pre add item
-
 
         try {
             $cartItem = $productHandlerManager->resolveCartItem($product, $options);
@@ -93,7 +121,7 @@ class CartController extends Controller
 
                 $cartItem->setCart($cart);
 
-                $cartManager->save();
+                $this->cartManager->save();
 
                 $request->getSession()->getFlashBag()->add(
                     'success',
@@ -102,11 +130,14 @@ class CartController extends Controller
             }
         } catch (\Exception $e) {
             $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+            if ($targetUrl = $request->headers->get('Referer')) {
+                return $this->utils->redirect($targetUrl);
+            }
         }
 
         // @TODO: event cart post add item
 
-        return $this->redirect($this->generateUrl('ecommerce_cart'));
+        return $this->utils->redirect($this->utils->generateUrl('ecommerce_cart'));
     }
 
 
@@ -115,18 +146,11 @@ class CartController extends Controller
 
     public function removeCartItemAction(Request $request, $cartItemId)
     {
-        if (!$request->isMethod('DELETE')) {
-            throw new \Exception('Wrong request method');
-        }
-
 //        if (null === ($productId = $request->request->get('product_id'))) {
 //            throw new \Exception('No product id provided');
 //        }
 
-        /** @var CartManager $cartManager */
-        $cartManager = $this->get('ecommerce_core.cart.manager');
-
-        $cart = $cartManager->getOrCreateCart();
+        $cart = $this->cartManager->getOrCreateCart();
 
         $cartItems = $cart->getItems();
 
@@ -156,7 +180,7 @@ class CartController extends Controller
         );
 
 
-        return $this->redirect($this->generateUrl('ecommerce_cart'));
+        return $this->utils->redirect($this->utils->generateUrl('ecommerce_cart'));
 
         $response = new Response();
         $response->setStatusCode(204);

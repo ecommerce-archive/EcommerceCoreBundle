@@ -2,6 +2,8 @@
 
 ## Description
 
+! Work in progress - Not Ready for Production Use !
+
 This bundle provides a product and cart model. Products are saved in [PHPCR](http://phpcr.github.io/). The cart uses Doctrine ORM.
 
 ## Installation

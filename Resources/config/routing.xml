@@ -9,35 +9,43 @@
     </route>
 
     <route id="ecommerce_products" path="/products/" methods="GET">
-        <default key="_controller">EcommerceCoreBundle:Sandbox:index</default>
+        <default key="_controller">ecommerce_core.product.controller:indexAction</default>
     </route>
 
     <route id="ecommerce_product_create" path="/products/" methods="POST">
-        <default key="_controller">EcommerceCoreBundle:Sandbox:create</default>
+        <default key="_controller">ecommerce_core.product.controller:createAction</default>
     </route>
 
     <route id="ecommerce_product_view" path="/products/{id}" methods="GET">
-        <default key="_controller">EcommerceCoreBundle:Sandbox:view</default>
+        <default key="_controller">ecommerce_core.product.controller:viewAction</default>
+        <requirement key="id">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
     </route>
 
     <route id="ecommerce_product_update" path="/products/{id}" methods="PUT">
-        <default key="_controller">EcommerceCoreBundle:Sandbox:update</default>
+        <default key="_controller">ecommerce_core.product.controller:updateAction</default>
+        <requirement key="id">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
     </route>
 
     <route id="ecommerce_product_delete" path="/products/{id}" methods="DELETE">
-        <default key="_controller">EcommerceCoreBundle:Sandbox:delete</default>
+        <default key="_controller">ecommerce_core.product.controller:deleteAction</default>
+        <requirement key="id">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
     </route>
 
+
     <route id="ecommerce_cart" path="/cart/" methods="GET">
-        <default key="_controller">EcommerceCoreBundle:Cart:index</default>
+        <default key="_controller">ecommerce_core.cart.controller:indexAction</default>
+    </route>
+
+    <route id="ecommerce_cart_clear" path="/cart/" methods="DELETE">
+        <default key="_controller">ecommerce_core.cart.controller:clearCartAction</default>
     </route>
 
     <route id="ecommerce_cart_add_product" path="/cart/" methods="POST">
-        <default key="_controller">EcommerceCoreBundle:Cart:addProduct</default>
+        <default key="_controller">ecommerce_core.cart.controller:addProductAction</default>
     </route>
 
     <route id="ecommerce_cart_item_remove" path="/cart/{cartItemId}" methods="DELETE">
-        <default key="_controller">EcommerceCoreBundle:Cart:removeCartItem</default>
+        <default key="_controller">ecommerce_core.cart.controller:removeCartItemAction</default>
         <requirement key="cartItemId">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
     </route>
 

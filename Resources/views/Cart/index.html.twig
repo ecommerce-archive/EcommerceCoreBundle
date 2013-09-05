@@ -2,85 +2,102 @@
 
 {% block body %}
 
-  {% set flashBag = app.session.flashbag.all() %}
-  {% if flashBag|length > 0 %}
+    {% set flashBag = app.session.flashbag.all() -%}
+    {% if flashBag|length > 0 -%}
     <div class="notifications">
-    {% for type, flashMessages in flashBag %}
-      {% for flashMessage in flashMessages -%}
-        <div class="alert alert-{{ type }}">
-          {{ flashMessage }}
-        </div>
+    {%- for type, flashMessages in flashBag -%}{%- for flashMessage in flashMessages %}
 
-      {% endfor %}
-    {% endfor %}
+      <div class="alert alert-{{ type }}">
+        {{- flashMessage -}}
+      </div>
+    {%- endfor %}{% endfor %}
+
     </div>
-  {% endif %}
+
+    {% endif -%}
 
 
-  <div>
-  {% if cart %}
+    <div>
+    {%- if cart %}
 
-    {{ cart.id }}
+      <h3>Cart ID: {{ cart.id ?: '-' }}</h3>
 
-    <ul>
+      {%- if cart.id %}
+        <form action="{{ path('ecommerce_cart_clear') }}" method="post">
+          <input type="hidden" name="_method" value="DELETE" />
+          <button type="submit">clear cart</button>
+        </form>
+      {%- endif %}
 
-    {% for item in cart.items %}
-      <li>
-        {{ item.id }}
-          - {{ item.product.id }}
+      <ul>
+        {%- for item in cart.items %}
+
+        <li>
+          <table>
+            <tbody>
+              <tr>
+                <th>cart item id</th>
+                <td>{{ item.id }}</td>
+              </tr>
+              <tr>
+                <th>product id</th>
+                <td>{{ item.product.id }}</td>
+              </tr>
+              <tr>
+                <th>product name</th>
+                <td>{{ item.product.name }}</td>
+              </tr>
+            </tbody>
+          </table>
           <ol>
-            {#
-            {% for key, property in item.product.properties.node.getPropertiesValues %}
-              <li>{{ key }} {{property|join(', ') }}</li>
-            {% endfor %}
-            #}
+            {%- for key, property in item.options %}
+
+            <li>{{ key }} {{ property }}</li>
+            {%- endfor %}
+
           </ol>
 
+          <form action="{{ path('ecommerce_cart_item_remove', { 'cartItemId': item.id }) }}" method="post">
+            <input type="hidden" name="_method" value="DELETE" />
+            <button type="submit">x</button>
+          </form>
+        </li>
+        {%- endfor %}
 
-        <form action="{{ path('ecommerce_cart_item_remove', { 'cartItemId': item.id }) }}" method="post">
-          <input type="hidden" name="_method" value="DELETE" />
-          <button type="submit">x</button>
-        </form>
-      </li>
-    {% endfor %}
-    </ul>
+      </ul>
 
-  {% else %}
-    No cart yet
-  {% endif %}
+    {% else -%}
+      No cart items yet
+    {%- endif -%}
   </div>
 
   <form action="{{ path('ecommerce_cart_add_product') }}" method="post">
-    {#<input type="hidden" name="product_id" value="84e46665-c2a0-4e10-9d60-cef7ed9ba47f" />#}
+    {#<input type="hidden" name="product_id" value="84e46665-c2a0-4e10-9d60-cef7ed9ba47f" />-#}
     <label>Product:</label>
-    {% if products|length >0  %}
+    {% if products|length > 0 -%}
     <select name="product_id">
-      <option value="">Product auswählen</option>
-      {% for product in products %}
+      <option value="">Choose product</option>
+      {%- for product in products %}
+
       <option value="{{ product.getIdentifier() }}">{{ product.name }}</option>
-      {% endfor %}
+      {%- endfor %}
+
     </select>
-    {% else %}
+    {% else -%}
       --- no products available ---
-    {% endif %}
+    {% endif -%}
     <br />
-    <select name="option[size]">
-      <option value="">Wählen</option>
+    Size: <select name="option[size]">
+      <option value="">Choose</option>
       <option value="36">36</option>
       <option value="38">38</option>
       <option value="40">40</option>
     </select><br />
-    <select name="option[backup]">
-      <option value="">Nein, danke</option>
-      <option value="36">36</option>
-      <option value="38">38</option>
-      <option value="40">40</option>
-    </select><br />
-    Mietdauer:
-    <input type="radio" name="option[rental_duration]" value="4" checked="checked" /> 4 -
-    <input type="radio" name="option[rental_duration]" value="8" /> 8
+    Length:
+    <input type="radio" name="option[length]" value="5" checked="checked" /> 5 -
+    <input type="radio" name="option[length]" value="10" /> 10
     <br />
-    <input type="text" name="option[rental_date]" value="{{ "now"|date_modify("+3 days")|date('d.m.Y') }}" />
+    Delivery date: <input type="text" name="option[delivery_date]" value="{{ "now"|date_modify("+3 days")|date('d.m.Y') }}" />
     <button type="submit">Go</button>
   </form>
 

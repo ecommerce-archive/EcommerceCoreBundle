@@ -17,6 +17,9 @@
         <parameter key="ecommerce_core.cart.manager.class">Ecommerce\Bundle\CoreBundle\Cart\Manager</parameter>
         <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
         <parameter key="ecommerce_core.product.handler_manager.class">Ecommerce\Bundle\CoreBundle\Product\HandlerManager</parameter>
+        <parameter key="ecommerce_core.controller_utils.class">Ecommerce\Bundle\CoreBundle\Util\ControllerUtils</parameter>
+        <parameter key="ecommerce_core.cart.controller.class">Ecommerce\Bundle\CoreBundle\Controller\CartController</parameter>
+        <parameter key="ecommerce_core.product.controller.class">Ecommerce\Bundle\CoreBundle\Controller\ProductController</parameter>
         <!--<parameter key="ecommerce_core.cart.session_storage_key">_ecommerce_cart_id</parameter>-->
     </parameters>
 
@@ -66,17 +69,40 @@
             <argument type="service" id="ecommerce_core.cart.repository" />
             <argument type="service" id="session" />
             <!--<argument>%ecommerce_core.cart.session_storage_key%</argument>-->
+            <call method="setEventDispatcher">
+                <argument type="service" id="event_dispatcher" />
+            </call>
         </service>
 
         <service id="ecommerce_core.product.manager" class="%ecommerce_core.product.manager.class%">
             <argument type="service" id="doctrine_phpcr.odm.document_manager" />
             <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
-            <argument type="service" id="service_container" />
+            <call method="setEventDispatcher">
+                <argument type="service" id="event_dispatcher" />
+            </call>
         </service>
 
         <service id="ecommerce_core.product.handler_manager" class="%ecommerce_core.product.handler_manager.class%">
             <argument type="collection"/>
             <!--<argument type="service" id="ecommerce_core.product_handlers" />-->
+        </service>
+
+        <service id="ecommerce_core.cart.controller" class="%ecommerce_core.cart.controller.class%">
+            <argument type="service" id="ecommerce_core.controller_utils" />
+            <argument type="service" id="ecommerce_core.cart.manager" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="ecommerce_core.product.controller" class="%ecommerce_core.product.controller.class%">
+            <argument type="service" id="ecommerce_core.controller_utils" />
+            <argument type="service" id="ecommerce_core.product.manager" />
+            <argument type="service" id="service_container" />
+        </service>
+
+        <service id="ecommerce_core.controller_utils" class="%ecommerce_core.controller_utils.class%">
+            <call method="setContainer">
+                <argument type="service" id="service_container" />
+            </call>
         </service>
 
         <service id="ecommerce_core.initializer" class="Doctrine\Bundle\PHPCRBundle\Initializer\GenericInitializer">

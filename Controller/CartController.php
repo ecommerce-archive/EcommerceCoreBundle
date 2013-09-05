@@ -56,19 +56,7 @@ class CartController
 
         // @TODO: Remove test code
         $data['products'] = $this->utils->getProductManager()->findAll(); //->toArray()
-        $product = $data['products']->first();
-//        $data['products']->initialize();
-//        $product = $data['products'];
 
-        $serializer = $this->utils->get('jms_serializer');
-        $result = $serializer->serialize($product->getNode(), 'json', $view->getSerializationContext());
-
-        echo $result;
-
-
-//        $data = $serializer->deserialize($inputStr, $typeName, $format);
-
-//        $view->setData($cart);
         $view->setData($data);
         return $view;
 

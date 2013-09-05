@@ -23,20 +23,5 @@
             >
             <!--<xml-map inline="true" key-attribute-name="foo" entry-name="bar" />-->
         </property>
-
-        <!--xml-key-value-pairs="true"-->
-
-        <!--<property name="created_at" xml-attribute="true" type="DateTime" groups="all" />-->
-        <!--<property name="updated_at" type="DateTime" serialized-name="is_published" xml-attribute="true" groups="all" />-->
-        <!--jcr:created-->
-        <!--jcr:lastModified-->
-
-        <!--
-        <property name="comments" groups="comments">
-            <type><![CDATA[ArrayCollection<JMS\Serializer\Tests\Fixtures\Comment>]]></type>
-            <xml-list inline="true" entry-name="comment" />
-        </property>
-        <property name="author" groups="post" type="JMS\Serializer\Tests\Fixtures\Author" />
-        -->
     </class>
 </serializer>

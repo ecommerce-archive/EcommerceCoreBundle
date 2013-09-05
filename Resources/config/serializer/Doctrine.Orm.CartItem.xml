@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serializer>
+    <class name="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem" exclusion-policy="ALL" xml-root-name="cart">
+        <property name="id" expose="true" type="string" groups="all" />
+
+        <property name="product" expose="true" type="string" serialized-name="product_id" access-type="public_method" accessor-getter="getProductId" read-only="true" groups="all" />
+        <property name="options" expose="true" type="array" groups="all" />
+
+        <property name="price" expose="true" type="double" xml-attribute="true" groups="all" />
+
+        <property name="createdAt" type="DateTime" serialized-name="created_at" xml-attribute="true" groups="all" />
+        <property name="updatedAt" type="DateTime" serialized-name="updated_at" xml-attribute="true" groups="all" />
+        <property name="expiresAt" type="DateTime" serialized-name="expires_at" xml-attribute="true" groups="all" />
+    </class>
+</serializer>

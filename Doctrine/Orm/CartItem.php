@@ -99,6 +99,19 @@ class CartItem
 
 
     /**
+     * @return ProductReference
+     */
+    public function getProductId()
+    {
+        if (($product = $this->getProduct()) instanceof ProductReference) {
+            return $product->getId();
+        }
+
+        return null;
+    }
+
+
+    /**
      * @param array $options
      * @return CartItem
      */

@@ -16,7 +16,8 @@
         "jackalope/jackalope-doctrine-dbal": "1.0.0-beta3",
         "doctrine/phpcr-bundle": "1.0.0-beta4",
         "doctrine/phpcr-odm": "1.0.0-beta5",
-        "friendsofsymfony/rest-bundle": "1.0.*@dev"
+        "friendsofsymfony/rest-bundle": "1.0.*@dev",
+        "jms/serializer-bundle": "0.12.*"
     },
     "autoload":{
         "psr-0":{

@@ -268,7 +268,7 @@ class ControllerUtils extends ContainerAware
      *
      * @return View
      */
-    protected function view($data = null, $statusCode = null, array $headers = array())
+    public function view($data = null, $statusCode = null, array $headers = array())
     {
         return View::create($data, $statusCode, $headers);
     }
@@ -284,7 +284,7 @@ class ControllerUtils extends ContainerAware
      *
      * @return View
      */
-    protected function redirectView($url, $statusCode = Codes::HTTP_FOUND, array $headers = array())
+    public function redirectView($url, $statusCode = Codes::HTTP_FOUND, array $headers = array())
     {
         return RedirectView::create($url, $statusCode, $headers);
     }
@@ -301,7 +301,7 @@ class ControllerUtils extends ContainerAware
      *
      * @return View
      */
-    protected function routeRedirectView($route, array $parameters = array(), $statusCode = Codes::HTTP_CREATED, array $headers = array())
+    public function routeRedirectView($route, array $parameters = array(), $statusCode = Codes::HTTP_CREATED, array $headers = array())
     {
         return RouteRedirectView::create($route, $parameters, $statusCode, $headers);
     }
@@ -316,7 +316,7 @@ class ControllerUtils extends ContainerAware
      *
      * @return Response
      */
-    protected function handleView(View $view)
+    public function handleView(View $view)
     {
         return $this->get('fos_rest.view_handler')->handle($view);
     }

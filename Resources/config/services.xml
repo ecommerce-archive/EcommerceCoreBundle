@@ -67,6 +67,7 @@
 
         <service id="ecommerce_core.cart.manager" class="%ecommerce_core.cart.manager.class%">
             <argument type="service" id="ecommerce_core.cart.repository" />
+            <argument type="service" id="ecommerce_core.cart_item.repository" />
             <argument type="service" id="session" />
             <!--<argument>%ecommerce_core.cart.session_storage_key%</argument>-->
             <call method="setEventDispatcher">

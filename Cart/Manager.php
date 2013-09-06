@@ -5,13 +5,20 @@ namespace Ecommerce\Bundle\CoreBundle\Cart;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Doctrine\Common\Collections\Criteria;
+
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart;
 use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartRepository;
+use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem;
+use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItemRepository;
 
 class Manager
 {
     /** @var CartRepository */
     private $cartRepository;
+
+    /** @var CartItemRepository */
+    private $cartItemRepository;
 
     /** @var Session */
     private $session;
@@ -30,11 +37,12 @@ class Manager
     /**
      * Constructor.
      */
-    public function __construct(CartRepository $cartRepository, Session $session, $storageKey = '_ecommerce_cart_id')
+    public function __construct(CartRepository $cartRepository, CartItemRepository $cartItemRepository, Session $session, $storageKey = '_ecommerce_cart_id')
     {
-        $this->cartRepository = $cartRepository;
-        $this->session        = $session;
-        $this->storageKey     = $storageKey;
+        $this->cartRepository     = $cartRepository;
+        $this->cartItemRepository = $cartItemRepository;
+        $this->session            = $session;
+        $this->storageKey         = $storageKey;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
@@ -61,6 +69,8 @@ class Manager
                 $cart = null;
             }
 
+            // @TODO: Cart items availability check
+
             if ($cart) {
                 $this->cart = $cart;
             }
@@ -83,6 +93,17 @@ class Manager
             return $cart;
         }
 
+        return $this->createCart();
+    }
+
+
+    /**
+     * Create a new cart
+     *
+     * @return Cart
+     */
+    public function createCart()
+    {
         $cart = $this->cartRepository->createNewCart();
 
         $this->session->set($this->storageKey, $cart->getId());
@@ -90,6 +111,33 @@ class Manager
         $this->cart = $cart;
 
         return $cart;
+    }
+
+
+    /**
+     * Get a cart item from a cart
+     *
+     * @return Cart
+     */
+    public function getCartItem(Cart $cart, $cartItemId)
+    {
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq("id", $cartItemId));
+
+        $foundItems = $cart->getItems()->matching($criteria);
+
+        return $foundItems->first();
+    }
+
+
+    /**
+     * Get a cart item from a cart
+     *
+     * @return Cart
+     */
+    public function removeCartItem(CartItem $cartItem)
+    {
+        return $this->cartItemRepository->remove($cartItem);
     }
 
     /**
@@ -111,6 +159,7 @@ class Manager
     /**
      * Delete a cart
      *
+     * @param Cart $cart
      * @return bool
      */
     public function delete(Cart $cart)

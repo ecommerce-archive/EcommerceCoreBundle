@@ -6,10 +6,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\View\View;
+use FOS\Rest\Util\Codes;
 use JMS\Serializer\SerializationContext;
-
-use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Collections\Criteria;
 
 use Ecommerce\Bundle\CoreBundle\Util\ControllerUtils;
 use Ecommerce\Bundle\CoreBundle\Cart\Manager as CartManager;
@@ -26,92 +24,160 @@ class CartController
     private $cartManager;
 
 
-    function __construct(ControllerUtils $utils, CartManager $cartManager)
+    /**
+     * Constructor.
+     *
+     * @param ControllerUtils $utils
+     * @param CartManager     $cartManager
+     */
+    public function __construct(ControllerUtils $utils, CartManager $cartManager)
     {
         $this->utils = $utils;
         $this->cartManager = $cartManager;
     }
 
 
+    /**
+     * @param Request $request
+     *
+     * @return View
+     */
     public function indexAction(Request $request)
     {
-        $view = View::create();
-
-        $view
-            ->setTemplate("EcommerceCoreBundle:Cart:index.html.twig")
-            ->setTemplateVar('cart')
-            ->setSerializationContext(
-                SerializationContext::create()
-                    ->setGroups(array('cart_index', 'cart', 'frontend', 'all', 'admin'))
-                    ->setSerializeNull(true)
-            )
-        ;
-
-
         $cart = $this->cartManager->getCart();
 
-        $data = array('cart' => $cart);
-
-        // @TODO: Cart items availability check
-
         // @TODO: Remove test code
-        $data['products'] = $this->utils->getProductManager()->findAll(); //->toArray()
+        $products = $this->utils->getProductManager()->findAll(); //->toArray()
 
-        $view->setData($data);
-        return $view;
-
-        return $this->utils->render(
-            'EcommerceCoreBundle:Cart:index.html.twig',
+        $view = View::create(
             array(
-                'cart' => $cart,
+                'cart'     => $cart,
                 'products' => $products,
             )
         );
+
+        $view->setTemplate("EcommerceCoreBundle:Cart:index.html.twig");
+
+        $serializationContext = SerializationContext::create();
+        $serializationContext->setGroups(
+            array_merge(
+                array('frontend', 'all'),
+                $request->query->has('summary') ? array() : array('cart_full', 'cart_default')
+            )
+        );
+        $view->setSerializationContext($serializationContext);
+
+        return $view;
     }
 
 
+    /**
+     * @param Request $request
+     *
+     * @return View
+     *
+     * @throws \Exception
+     */
     public function clearCartAction(Request $request)
     {
-        if (!$request->isMethod('DELETE')) {
-            throw new \Exception('Wrong request method');
-        }
-
         $cart = $this->cartManager->getCart();
+
+        // @TODO: Dispatch event?
 
         if ($cart) {
             $this->cartManager->delete($cart);
             $cart = null;
         }
 
-        // @TODO: Move into cart manager event
-        $request->getSession()->getFlashBag()->add('success', 'The cart was successfully cleared');
+        // @TODO: Dispatch event?
 
-        if ($referer = $request->headers->get('Referer')) {
-            return $this->utils->redirect($referer);
+        switch ($request->getRequestFormat()) {
+            case 'json':
+                $view = View::create(null, Codes::HTTP_NO_CONTENT);
+                break;
+
+            case 'html':
+                // @TODO: Move into event?
+                $request->getSession()->getFlashBag()->add('success', 'The cart was successfully cleared');
+
+                if ($referer = $request->headers->get('Referer')) {
+                    $view = $this->utils->redirectView($referer);
+                    break;
+                }
+                $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                break;
+
+            default:
+                throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
         }
 
-        return $this->utils->redirect($this->utils->generateUrl('ecommerce_cart'));
-
-        $response = new Response();
-        $response->setStatusCode(204);
-        return $response;
+        return $view;
     }
 
 
+    /**
+     * @param Request $request
+     *
+     * @return View
+     *
+     * @throws \Exception
+     */
     public function addProductAction(Request $request)
     {
-        if (!$productId = $request->request->get('product_id')) {
-            throw new \Exception('No product id provided');
-        }
-
         $cart = $this->cartManager->getOrCreateCart();
+
+        if (null === ($productId = $request->request->get('product_id'))) {
+
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view = View::create(array('errors' => array('Required parameter product id missing')), Codes::HTTP_BAD_REQUEST);
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('errors', array('Required parameter product id missing'));
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
+        }
 
         $productManager = $this->utils->getProductManager();
 
-        $product = $productManager->find($productId);
+        if (!$productId || !($product = $productManager->find($productId))) {
 
-        if (!$product) {
-            throw new \Exception('Product not found');
+            $errorMessage = $productId ? sprintf('Product with id %s not found', $productId) : 'No product id provided';
+
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view = View::create(array('errors' => array($errorMessage)), Codes::HTTP_NOT_FOUND);
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', $errorMessage);
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
         }
 
         /** @var ProductReferenceRepository $productReferenceRepo */
@@ -142,68 +208,225 @@ class CartController
                 $cartItem->setCart($cart);
 
                 $this->cartManager->save();
-
-                $request->getSession()->getFlashBag()->add(
-                    'success',
-                    sprintf('%s was successfully added to your cart', $cartItem->getProduct()->getName())
-                );
             }
         } catch (\Exception $e) {
-            $request->getSession()->getFlashBag()->add('error', $e->getMessage());
-            if ($targetUrl = $request->headers->get('Referer')) {
-                return $this->utils->redirect($targetUrl);
+
+            // @TODO: Dispatch event
+
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view =
+                        View::create(
+                            array(
+                                 'message' => sprintf('Product with id %s could not be added to the cart', $productId),
+                                 'errors' => array(
+                                     sprintf('Product with id %s could not be added to the cart', $productId) // @TODO: Add errors/options?
+                                 )
+                            ),
+                            Codes::HTTP_UNPROCESSABLE_ENTITY
+                        );
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+//                    $request->getSession()->getFlashBag()->add('error', sprintf('Product with id %s could not be added to the cart', $productId));
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
             }
+
+            return $view;
         }
 
-        // @TODO: event cart post add item
+        // @TODO: Dispatch event
 
-        return $this->utils->redirect($this->utils->generateUrl('ecommerce_cart'));
+        switch ($request->getRequestFormat()) {
+            case 'json':
+//                $view = View::create(array('cart' => $cart), Codes::HTTP_OK);
+                $view = View::create(null, Codes::HTTP_CREATED, array());
+
+                $view->setLocation($this->utils->generateUrl('ecommerce_cart_item_view', array('cartItemId' => $cartItem->getId()), true));
+
+                $view->setSerializationContext(SerializationContext::create()->setGroups(
+                    array('cart_full', 'cart_default', 'cart', 'frontend', 'all')
+                ));
+
+                break;
+
+            case 'html':
+                // @TODO: Move into event
+                $request->getSession()->getFlashBag()->add('success', sprintf('Product with id %s added to the cart', $productId));
+
+                if ($referer = $request->headers->get('Referer')) {
+                    $view = $this->utils->redirectView($referer);
+                    break;
+                }
+
+//                $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                $view = $this->utils->routeRedirectView('ecommerce_cart_item_view', array(), Codes::HTTP_FOUND);
+                break;
+
+            default:
+                throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+        }
+
+        return $view;
     }
 
+
+    /**
+     * @param Request $request
+     * @param string  $cartItemId
+     *
+     * @return View
+     * @throws \Exception
+     */
+    public function cartItemAction(Request $request, $cartItemId)
+    {
+        // @TODO: check
+        $cart = $this->cartManager->getOrCreateCart();
+
+        $cartItem = $this->cartManager->getCartItem($cart, $cartItemId);
+
+        if (!$cartItem) {
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view = View::create(
+                        array('errors' => array(sprintf('Cart item with id %s not found', $cartItemId))),
+                        Codes::HTTP_NOT_FOUND
+                    );
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', sprintf('Cart item with id %s not found', $cartItemId));
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
+        }
+
+
+        switch ($request->getRequestFormat()) {
+            case 'json':
+                $view = View::create(array('cart_item' => $cartItem));
+
+                $serializationContext = SerializationContext::create();
+                $serializationContext->setGroups(
+                    array('frontend', 'all')
+                );
+                $view->setSerializationContext($serializationContext);
+                break;
+
+            case 'html':
+                $config = false;
+
+                if ($config && ($referer = $request->headers->get('Referer'))) {
+                    $view = $this->utils->redirectView($referer);
+                    break;
+                }
+
+                $view = $this->utils->routeRedirectView('ecommerce_cart', array('item' => $cartItemId), Codes::HTTP_FOUND);
+                break;
+
+            default:
+                throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+        }
+
+        return $view;
+    }
 
     // @TODO: updateCartItemAction PUT method
 
 
+    /**
+     * @param Request $request
+     * @param string  $cartItemId
+     *
+     * @return View
+     *
+     * @throws \Exception
+     */
     public function removeCartItemAction(Request $request, $cartItemId)
     {
-//        if (null === ($productId = $request->request->get('product_id'))) {
-//            throw new \Exception('No product id provided');
-//        }
-
         $cart = $this->cartManager->getOrCreateCart();
 
-        $cartItems = $cart->getItems();
+        $cartItem = $this->cartManager->getCartItem($cart, $cartItemId);
 
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq("id", $cartItemId));
+        if (!$cartItem) {
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view = View::create(
+                        array('errors' => array(sprintf('Cart item with id %s not found', $cartItemId))),
+                        Codes::HTTP_NOT_FOUND
+                    );
+                    break;
 
-        $foundItems = $cartItems->matching($criteria);
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', sprintf('Cart item with id %s not found', $cartItemId));
 
-        if (count($foundItems) !== 1) {
-            // throw exception?
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
         }
 
-        $cartItem = $foundItems->first();
 
-        // @TODO: event cart pre remove item
+        $success = $this->cartManager->removeCartItem($cartItem);
 
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-
-        $em->remove($cartItem);
-        $em->flush();
+        // @TODO: Use $success
 
 
-        $request->getSession()->getFlashBag()->add(
-            'success',
-            sprintf('%s was successfully removed from your cart', $cartItem->getProduct()->getName())
-        );
 
+        switch ($request->getRequestFormat()) {
+            case 'json':
+                $view = View::create(null, Codes::HTTP_NO_CONTENT);
+                break;
 
-        return $this->utils->redirect($this->utils->generateUrl('ecommerce_cart'));
+            case 'html':
+                // @TODO: Move into event?
+                $request->getSession()->getFlashBag()->add(
+                    'success',
+                    sprintf('%s was successfully removed from your cart', $cartItem->getProduct()->getName())
+                );
 
-        $response = new Response();
-        $response->setStatusCode(204);
-        return $response;
+                if ($referer = $request->headers->get('Referer')) {
+                    $view = $this->utils->redirectView($referer);
+                    break;
+                }
+                $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                break;
+
+            default:
+                throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+        }
+
+        return $view;
     }
 }

@@ -3,8 +3,8 @@
 {% block body %}
 
     {% set flashBag = app.session.flashbag.all() -%}
-    {% if flashBag|length > 0 -%}
-    <div class="notifications">
+    {% if flashBag|length > 0 or true -%}
+    <div id="notifications" class="notifications">
     {%- for type, flashMessages in flashBag -%}{%- for flashMessage in flashMessages %}
 
       <div class="alert alert-{{ type }}">
@@ -23,7 +23,7 @@
       <h3>Cart ID: {{ cart.id ?: '-' }}</h3>
 
       {%- if cart.id %}
-        <form action="{{ path('ecommerce_cart_clear') }}" method="post">
+        <form action="{{ path('ecommerce_cart_clear') }}" id="cart-clear" method="post">
           <input type="hidden" name="_method" value="DELETE" />
           <button type="submit">clear cart</button>
         </form>
@@ -57,7 +57,7 @@
 
           </ol>
 
-          <form action="{{ path('ecommerce_cart_item_remove', { 'cartItemId': item.id }) }}" method="post">
+          <form action="{{ path('ecommerce_cart_item_remove', { 'cartItemId': item.id }) }}" id="cart-item-remove-{{ item.id }}" class="cart-item-remove" method="post">
             <input type="hidden" name="_method" value="DELETE" />
             <button type="submit">x</button>
           </form>
@@ -71,16 +71,18 @@
     {%- endif -%}
   </div>
 
-  <form action="{{ path('ecommerce_cart_add_product') }}" method="post">
+  <form action="{{ path('ecommerce_cart_add_product') }}" id="cart-add-product" method="post">
     {#<input type="hidden" name="product_id" value="84e46665-c2a0-4e10-9d60-cef7ed9ba47f" />-#}
     <label>Product:</label>
-    {% if products|length > 0 -%}
+    {% if products is defined and products|length > 0 -%}
     <select name="product_id">
       <option value="">Choose product</option>
       {%- for product in products %}
 
       <option value="{{ product.getIdentifier() }}">{{ product.name }}</option>
       {%- endfor %}
+      <option disabled="disabled"></option>
+      <option value="xxx">NON EXISTENT PRODUCT</option>
 
     </select>
     {% else -%}
@@ -99,6 +101,168 @@
     <br />
     Delivery date: <input type="text" name="option[delivery_date]" value="{{ "now"|date_modify("+3 days")|date('d.m.Y') }}" />
     <button type="submit">Go</button>
+
   </form>
 
+  <br />
+
+  {%- if cart and cart.id %}
+    <form action="{{ path('ecommerce_cart') }}" id="cart-get">
+      <button type="submit">get cart</button>
+    </form>
+  {%- endif %}
+
+  <label><input type="checkbox" id="jquery-toggle" /> Send via jQuery?</label>
+
+  <div id="ajax-logger" style="max-height: 200px; padding: 5px; border: 1px solid #ccc; font-family: monospace; overflow: auto;">
+
+  </div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+$(function () {
+  var notification = $('#notifications');
+  var ajax_logger = $('#ajax-logger');
+
+
+  $('#cart-add-product').on('submit', function (e) {
+    var formData;
+    if ($('#jquery-toggle').prop('checked')) {
+      e.preventDefault();
+
+      formData = $(this).serialize();
+
+      $.ajax({
+        type: 'POST',
+        url: '{{ path('ecommerce_cart_add_product') }}',
+        dataType: 'json',
+        data: formData,
+        success: function(response) {
+          var confirmation = $('<div class="alert alert-success">added</div>');
+
+          notification.prepend(confirmation);
+          ajax_logger.prepend($('<p>'+(new Date())+' '+response.responseText+': '+response.responseText+'</p>'));
+          console.log(response);
+
+          setTimeout(function () {
+            confirmation.detach();
+          }, 5000);
+        }, error: function(response) {
+          var confirmation = $('<div class="alert alert-error">NOT added - ERROR</div>');
+
+          notification.prepend(confirmation);
+          //ajax_logger.prepend($('<p>'+response+'</p>'));
+          ajax_logger.prepend($('<p>'+(new Date())+' '+response.status+': '+response.responseText+'</p>'));
+          console.log(response);
+
+          setTimeout(function () {
+            confirmation.detach();
+          }, 5000);
+        }
+      });
+    }
+
+    return true;
+  });
+
+
+  $('#cart-get').on('submit', function (e) {
+    var formData;
+    if ($('#jquery-toggle').prop('checked')) {
+      e.preventDefault();
+
+      formData = $(this).serialize();
+
+      $.ajax({
+        type: 'GET',
+        url: '{{ path('ecommerce_cart') }}',
+        dataType: 'json',
+        data: formData,
+        success: function(response, status, ajax) {
+          var confirmation = $('<div class="alert alert-success">cart loaded</div>');
+
+          notification.prepend(confirmation);
+          ajax_logger.prepend($('<p>'+(new Date())+' '+ajax.responseText+': '+ajax.responseText+'</p>'));
+          console.log(response);
+
+          setTimeout(function () {
+            confirmation.detach();
+          }, 5000);
+        },
+        error: function(response, status, ajax) {
+          var confirmation = $('<div class="alert alert-error">NOT loaded - ERROR</div>');
+
+          notification.prepend(confirmation);
+          //ajax_logger.prepend($('<p>'+response+'</p>'));
+          ajax_logger.prepend($('<p>'+(new Date())+' '+ajax.status+': '+ajax.responseText+'</p>'));
+          console.log(response);
+
+          setTimeout(function () {
+            confirmation.detach();
+          }, 5000);
+        }
+      });
+    }
+
+    return true;
+  });
+
+
+  $('#cart-clear').on('submit', function (e) {
+    var formData;
+    if ($('#jquery-toggle').prop('checked')) {
+      e.preventDefault();
+
+      formData = $(this).serialize();
+
+      $.ajax({
+        type: 'POST',
+        url: '{{ path('ecommerce_cart_clear') }}',
+        dataType: 'json',
+        data: formData,
+        success: function(response, status, ajax) {
+          var confirmation = $('<div class="alert alert-success">successfully cleared</div>');
+
+          notification.prepend(confirmation);
+          ajax_logger.prepend($('<p>'+(new Date())+' '+ajax.status+'</p>'));
+          console.log(ajax);
+
+          setTimeout(function () {
+            confirmation.detach();
+          }, 5000);
+        }, error: function(response) {
+          var confirmation = $('<div class="alert alert-error">NOT cleared - ERROR</div>');
+
+          notification.prepend(confirmation);
+          //ajax_logger.prepend($('<p>'+response+'</p>'));
+          ajax_logger.prepend($('<p>'+(new Date())+' '+ajax.status+'</p>'));
+          console.log(ajax);
+
+          setTimeout(function () {
+            confirmation.detach();
+          }, 5000);
+        }
+      });
+    }
+
+    return true;
+  });
+
+  $('#cart-add-product2').on('submit', function (e) {
+    if ($('#jquery-toggle').prop('checked')) {
+      e.preventDefault();
+
+      $.ajax({
+        type: 'PUT',
+        url: '{{ path('ecommerce_cart_add_product') }}',
+        data: { id: ownerId, field: field, status: status },
+        success: function(response) {
+        }
+      });
+    }
+
+    return true;
+  });
+});
+</script>
 {% endblock %}

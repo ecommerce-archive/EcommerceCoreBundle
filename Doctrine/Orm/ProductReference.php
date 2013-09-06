@@ -2,6 +2,8 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Doctrine\Orm;
 
+use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
+
 class ProductReference
 {
     /** @var string */
@@ -10,6 +12,7 @@ class ProductReference
     /** @var string */
     private $name;
 
+    /** @var Product */
     private $product;
 
 
@@ -33,6 +36,7 @@ class ProductReference
 
     /**
      * @param string $name
+     *
      * @return ProductReference
      */
     public function setName($name)
@@ -48,13 +52,21 @@ class ProductReference
         return $this->name;
     }
 
-    public function setProduct($proxy)
+
+    /**
+     * @param Product $product
+     * @return $this
+     */
+    public function setProduct(Product $product)
     {
-        $this->product = $proxy;
+        $this->product = $product;
 
         return $this;
     }
 
+    /**
+     * @return Product
+     */
     public function getProduct()
     {
         return $this->product;

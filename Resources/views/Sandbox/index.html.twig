@@ -1,35 +1,34 @@
 {% extends '::base.html.twig' %}
 
 {% block body %}
-Hello {{ name }}!
+
+  {% set flashBag = app.session.flashbag.all() -%}
+  {% if flashBag|length > 0 -%}
+    <div id="notifications" class="notifications">
+      {%- for type, flashMessages in flashBag -%}{%- for flashMessage in flashMessages %}
+
+        <div class="alert alert-{{ type }}">
+          {{- flashMessage -}}
+        </div>
+      {%- endfor %}{% endfor %}
+
+    </div>
+
+  {% endif -%}
+
+
+  <h2>Hello {{ name }}!</h2>
 
 {% if products|length > 0 %}
   <ul>
   {% for product in products %}
     <li>
-      {{ product.nodename }}
-
-      <form action="{{ path('ecommerce_product_update', { 'id': product.getIdentifier }) }}" method="post">
-        <input type="hidden" name="_method" value="PUT" />
-        <input type="text" name="name" value="{{ product.name }}" />
-        <button type="submit">save</button>
-      </form>
-
-      <form action="{{ path('ecommerce_product_delete', { 'id': product.getIdentifier }) }}" method="post">
-        <input type="hidden" name="_method" value="DELETE" />
-        <button type="submit">x</button>
-      </form>
+      {{ product.nodename }} <a href="{{ path('ecommerce_product_view_id', {'id': product.identifier}) }}">view</a>
     </li>
   {% endfor %}
   </ul>
 {% else %}
   no products found
 {% endif %}
-
-  <form action="{{ path('ecommerce_product_create') }}" method="post">
-    {# <input type="hidden" name="_method" value="DELETE" /> #}
-    <input type="text" name="name" />
-    <button type="submit">create</button>
-  </form>
 
 {% endblock %}

@@ -3,10 +3,12 @@
 namespace Ecommerce\Bundle\CoreBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
-use Doctrine\ODM\PHPCR\DocumentManager;
+use FOS\RestBundle\View\View;
+use FOS\Rest\Util\Codes;
+use JMS\Serializer\SerializationContext;
 
+use Ecommerce\Bundle\CoreBundle\Util\ControllerUtils;
 use Ecommerce\Bundle\CoreBundle\Product\Manager as ProductManager;
 
 class ProductController
@@ -25,139 +27,118 @@ class ProductController
     }
 
 
-    public function indexAction()
+    /**
+     * @param Request $request
+     *
+     * @return View
+     */
+    public function indexAction(Request $request)
     {
-        $createdProduct = $this->productManager->createProduct();
-
         $products = $this->productManager->findAll();
 
-        return $this->render(
-        	'EcommerceCoreBundle:Sandbox:index.html.twig',
-        	array(
-        		'name' => 'there',
-        		'products' => $products,
-    		)
-    	);
-    }
-
-
-    public function newAction()
-    {
-
-    }
-
-
-    public function createAction(Request $request)
-    {
-        $id = $request->request->get('name');
-
-        $product = $this->productManager->find($id);
-
-        if ($product) {
-            throw new \Exception('already exists');
-            return $this->redirect($this->generateUrl('ecommerce_core_homepage'));
-        }
-
-        $product = $this->productManager->createProduct($id);
-
-        if (!$product) {
-            throw new \Exception('Product wasn’t created');
-            return $this->redirect($this->generateUrl('ecommerce_core_homepage'));
-        }
-
-        $success = $this->productManager->save($product);
-
-        if (!$success) {
-            throw new \Exception('New product wasn’t saved');
-            return $this->redirect($this->generateUrl('ecommerce_core_homepage'));
-        }
-
-        $statusCode = 201;
-
-        $response = new Response();
-        $response->setStatusCode($statusCode);
-
-        if (201 === $statusCode) {
-            $response->headers->set('Location',
-                $this->generateUrl(
-                    'ecommerce_product_view', array('id' => $product->getIdentifier()),
-                    true
-                )
-            );
-        }
-
-        return $response;
-    }
-
-
-    public function updateAction($id, Request $request)
-    {
-        $product = $this->productManager->find($id);
-
-        if (!$product) {
-            throw $this->createNotFoundException(sprintf('Product with ID %s was not found', $id));
-        }
-
-//        $product->setName($request->request->get('name'));
-
-        $product->node->setProperty('cyl', '54da3bec-30f3-4245-80aa-e0d36cd88445', \PHPCR\PropertyType::REFERENCE);
-
-        $success = $this->productManager->save($product);
-
-        if (!$success) {
-            throw new \Exception('Product wasn’t saved');
-            return $this->redirect($this->generateUrl('ecommerce_core_homepage'));
-        }
-
-        $response = new Response(
-            '',
-            200,
+        $view = View::create(
             array(
-                'Content-Location' => $this->generateUrl(
-                    'ecommerce_product_view', array('id' => $product->getIdentifier()),
-                    true
-                )
+                 'name' => 'there',
+                 'products' => $products,
             )
         );
 
-//        $response->headers->set('Content-Location',
-//            $this->generateUrl(
-//                'ecommerce_product_view', array('id' => $product->getIdentifier()),
-//                true
-//            )
-//        );
+        $view->setTemplate("EcommerceCoreBundle:Sandbox:index.html.twig");
 
-        return $response;
+        $serializationContext = SerializationContext::create();
+        $serializationContext->setGroups(
+            array_merge(
+                array('frontend', 'all'),
+                $request->query->has('summary') ? array() : array('cart_full', 'cart_default')
+            )
+        );
+        $view->setSerializationContext($serializationContext);
+
+        return $view;
     }
 
 
-    public function viewAction($id)
+    /**
+     * @param string  $id
+     * @param Request $request
+     *
+     * @return View
+     *
+     * @throws \Exception
+     */
+    public function viewAction($id = false, $slug = false, Request $request)
     {
-        $product = $this->productManager->find($id);
-
-        if (!$product) {
-            return $this->createNotFoundException(sprintf('Product with ID %s was not found', $id));
+        // @TODO: Create seperate methods
+        if ($id) {
+            $product = $this->productManager->find($id);
+        } else {
+            $product = $this->productManager->findByName($slug);
         }
 
-        return new Response(var_export($product->getId(), true));
-    }
-
-
-    public function deleteAction($id)
-    {
-        $product = $this->productManager->find($id);
-
         if (!$product) {
-            return $this->createNotFoundException(sprintf('Product with ID %s was not found', $id));
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view = View::create(
+                        array('errors' => array(sprintf('Product with id %s not found', $id))),
+                        Codes::HTTP_NOT_FOUND
+                    );
+                    break;
+
+                case 'html':
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $request->getSession()->getFlashBag()->add('error', sprintf('Product with id %s not found', $id));
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+
+                    throw $this->utils->createNotFoundException('Product not found');
+                    $view = $this->utils->routeRedirectView('ecommerce_products', array(), Codes::HTTP_FOUND);
+//                    $view = $this->utils->view(null, Codes::HTTP_NOT_FOUND)->setTemplateVar(false);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
         }
 
-        $success = $this->productManager->delete($product);
+        $view = View::create(array('product' => $product));
 
-        $response = new Response();
-        $response->setStatusCode(204);
-        return $response;
+        switch ($request->getRequestFormat()) {
+            case 'json':
 
+                $additionalGroups = array();
+                if ($productViews = $request->query->get('view')) {
+                    $allowedViews = array('full', 'default');
 
-        return $this->redirect($this->generateUrl('ecommerce_core_homepage'));
+                    $productViews = explode(',', trim($productViews));
+                    foreach ($productViews as $productView) {
+                        if (in_array($productView, $allowedViews)) {
+                            $additionalGroups = 'product_'.$productView;
+                        }
+                    }
+                }
+
+                $serializationContext = SerializationContext::create();
+                $serializationContext->setGroups(
+                    array_merge(
+                        array('product', 'frontend', 'all'),
+                        !empty($additionalGroups) ? $additionalGroups : array('product_default')
+                    )
+                );
+                break;
+
+            case 'html':
+                $view->setTemplate("EcommerceCoreBundle:Sandbox:view.html.twig");
+
+                break;
+
+            default:
+                throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+        }
+
+        return $view;
     }
 }

@@ -79,15 +79,6 @@ class Manager
     }
 
 
-    /**
-     * @param string $id
-     * @return null|Product
-     */
-    public function createReference($id)
-    {
-        return $this->dm->getReference('Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product', $id);
-    }
-
     public function save(Product $product = null)
     {
         try {
@@ -101,6 +92,7 @@ class Manager
             return false;
         }
     }
+
 
     public function delete(Product $product)
     {
@@ -121,6 +113,15 @@ class Manager
     public function find($id)
     {
         return $this->dm->find(null, $id);
+    }
+
+    /**
+     * @param string $id
+     * @return Product|null
+     */
+    public function findByName($id)
+    {
+        return $this->dm->find(null, $this->basepath.'/'.$id);
     }
 
     /**

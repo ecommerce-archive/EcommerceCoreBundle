@@ -5,23 +5,21 @@
 
         <property name="name" expose="true" type="string" groups="all" />
 
-        <property name="status" expose="true" type="integer" groups="all" />
+        <property name="status" expose="true" type="integer" groups="product_full,admin" />
 
         <property name="node"
             expose="true"
             type="array"
             serialized-name="properties"
-
             access-type="public_method"
             accessor-getter="getPublicNodeProperties"
             accessor-setter="set"
             inline="true"
             read-only="true"
-            groups="all"
+            groups="product_full,product_default"
             xml-attribute-map="true"
             max-depth="2"
             >
-            <!--<xml-map inline="true" key-attribute-name="foo" entry-name="bar" />-->
         </property>
     </class>
 </serializer>

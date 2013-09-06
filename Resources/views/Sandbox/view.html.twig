@@ -1,0 +1,23 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+
+  <h1>{{ product.id }}</h1>
+
+  <h2>{{ product.identifier }}</h2>
+
+
+  <p><small>{{ product.get('jcr:created')|date('d.m.Y H:i:s') }}</small></p>
+  <p><small>{{ product.get('jcr:lastModified')|date('d.m.Y H:i:s') }}</small></p>
+
+    <ul>
+  {% for key, property in product.getPublicNodeProperties  %}
+    <li><b>{{ key }}:</b> {{ property|json_encode }}</li>
+  {% endfor %}
+    </ul>
+
+  <code>
+  {{ product.all | json_encode }}
+  </code>
+
+{% endblock %}

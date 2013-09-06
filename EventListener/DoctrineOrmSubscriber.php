@@ -2,14 +2,13 @@
 
 namespace Ecommerce\Bundle\CoreBundle\EventListener;
 
-
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
+use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference;
 
 class DoctrineOrmSubscriber implements EventSubscriber
 {
@@ -33,9 +32,18 @@ class DoctrineOrmSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return array(
+            'postLoad',
 //            'prePersist',
 //            'preUpdate',
         );
+    }
+
+
+    public function postLoad(LifecycleEventArgs $args)
+    {
+        if ($args->getEntity() instanceof ProductReference) {
+            $this->addProduct($args->getEntity());
+        }
     }
 
 
@@ -54,5 +62,13 @@ class DoctrineOrmSubscriber implements EventSubscriber
     {
         $entity = $args->getEntity();
         $changes = $args->getEntityChangeSet();
+    }
+
+
+
+    private function addProduct(ProductReference $productReference)
+    {
+        $productRepo = $this->container->get('ecommerce_core.product.repository');
+        $productReference->setProduct($productRepo->getReference($productReference->getId()));
     }
 }

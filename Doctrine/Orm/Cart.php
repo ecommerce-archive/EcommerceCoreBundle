@@ -109,7 +109,7 @@ class Cart
 
 
     /**
-     * @return CartItem[]
+     * @return CartItem[]|ArrayCollection
      */
     public function getItems()
     {

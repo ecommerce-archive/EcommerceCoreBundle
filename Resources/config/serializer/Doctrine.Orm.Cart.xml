@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <serializer>
-    <class name="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart" exclusion-policy="ALL" xml-root-name="cart">
-        <property name="id" expose="true" type="string" groups="all" />
+    <class name="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\Cart" exclusion-policy="ALL" xml-root-name="cart"
+        accessor-order="custom" custom-accessor-order="id,status,totalItems,total,items,createdAt,updatedAt,expiresAt">
+        <property name="id" expose="true" type="string" groups="cart_full,cart_default,all" />
 
-        <property name="status" expose="true" type="integer" groups="all" />
+        <property name="status" expose="true" type="integer" groups="cart_full,cart_default" />
 
-        <property name="totalItems" expose="true" type="integer" serialized-name="total" xml-attribute="true" groups="all" />
-        <property name="total" expose="true" type="double" serialized-name="total" xml-attribute="true" groups="all" />
+        <property name="totalItems" expose="true" type="integer" serialized-name="total_items" xml-attribute="true" groups="cart_full,cart_default,all" />
+        <property name="total" expose="true" type="double" serialized-name="total" xml-attribute="true" groups="cart_full,cart_default" />
 
-        <property name="createdAt" expose="true" type="DateTime" serialized-name="created_at" xml-attribute="true" groups="all" />
-        <property name="updatedAt" expose="true" type="DateTime" serialized-name="updated_at" xml-attribute="true" groups="all" />
-        <property name="expiresAt" expose="true" type="DateTime" serialized-name="expires_at" xml-attribute="true" groups="all" />
+        <property name="createdAt" expose="true" type="DateTime" serialized-name="created_at" xml-attribute="true" groups="cart_full,cart_default" />
+        <property name="updatedAt" expose="true" type="DateTime" serialized-name="updated_at" xml-attribute="true" groups="cart_full,cart_default" />
+        <property name="expiresAt" expose="true" type="DateTime" serialized-name="expires_at" xml-attribute="true" groups="cart_full,cart_default" />
 
-        <property name="items" expose="true" groups="all">
+        <property name="items" expose="true" groups="cart_full">
             <type><![CDATA[ArrayCollection<Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem>]]></type>
             <xml-list inline="true" entry-name="item" />
         </property>

@@ -30,15 +30,6 @@ class ProductReferenceRepository extends EntityRepository
         return $this->create($product);
     }
 
-    public function getReference($productId)
-    {
-//        $productReference = $this->find($product->getIdentifier());
-
-        $productReference = $this->_em->getReference($this->getClassName(), $productId);
-
-        return $productReference;
-    }
-
     public function delete(Product $product)
     {
         $productReference = $this->find($product->getIdentifier());
@@ -52,5 +43,12 @@ class ProductReferenceRepository extends EntityRepository
         $this->_em->flush();
 
         return true;
+    }
+
+    public function getReference($productId)
+    {
+        $productReference = $this->_em->getReference($this->getClassName(), $productId);
+
+        return $productReference;
     }
 }

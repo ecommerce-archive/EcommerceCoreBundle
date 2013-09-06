@@ -12,10 +12,6 @@ use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
 
 class DoctrinePhpcrSubscriber implements EventSubscriber
 {
-    protected $productType;
-
-    protected $productProvider;
-
     protected $userId;
 
     /**
@@ -38,10 +34,19 @@ class DoctrinePhpcrSubscriber implements EventSubscriber
     public function getSubscribedEvents()
     {
         return array(
+            'postLoad',
             'postPersist',
             'preUpdate',
             'preRemove',
         );
+    }
+
+
+    public function postLoad(LifecycleEventArgs $args)
+    {
+        if ($args->getObject() instanceof Product) {
+            $this->addProductReference($args->getObject());
+        }
     }
 
     public function postPersist(LifecycleEventArgs $args)
@@ -82,6 +87,13 @@ class DoctrinePhpcrSubscriber implements EventSubscriber
     }
 
 
+    private function addProductReference(Product $product)
+    {
+        $productReference = $this->container->get('ecommerce_core.product_reference.repository')->getReference($product->getIdentifier());
+        $product->setProductReference($productReference);
+    }
+
+
     private function getUserId()
     {
         if ($this->userId !== null) {
@@ -98,7 +110,7 @@ class DoctrinePhpcrSubscriber implements EventSubscriber
         if ((null === $token = $securityContext->getToken())
             || !is_object($user = $token->getUser())
         ) {
-            return null;
+            return $this->userId = false;
         }
 
         return $this->userId = $user->getId();

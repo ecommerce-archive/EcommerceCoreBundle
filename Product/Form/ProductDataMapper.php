@@ -85,7 +85,9 @@ class ProductDataMapper implements DataMapperInterface
             $config = $form->getConfig();
 
             if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
-                if (!is_object($data) || !$config->getByReference() || $form->getData() !== $node->getPropertyValueWithDefault(strval($propertyPath), null)) {
+                if ($config->getOption('translate_field', false) && is_array($form->getData())) {
+                    $data->setTranslatedProperty(strval($propertyPath), $form->getData());
+                } elseif (!is_object($data) || !$config->getByReference() || $form->getData() !== $node->getPropertyValueWithDefault(strval($propertyPath), null)) {
                     $node->setProperty(strval($propertyPath), $form->getData());
                 }
             }

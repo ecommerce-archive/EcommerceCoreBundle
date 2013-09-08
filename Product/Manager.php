@@ -52,16 +52,18 @@ class Manager
     public function createProduct($name = false, $withNode = false)
     {
         $product = new Product();
-        $product->setParent($this->getProductNode());
+
+        $parentNode = $this->getProductNode();
 
         if (strlen($name)) {
-            if ($this->getProductNode()->getNode()->hasNode($name)) {
+            if ($parentNode->getNode()->hasNode($name)) {
                 return null;
             }
         } else {
             $name = sha1(mt_rand());
         }
 
+        $product->setParent($parentNode);
         $product->setNodename($name);
         $product->setName($name);
 

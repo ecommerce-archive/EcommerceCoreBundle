@@ -12,8 +12,8 @@ class Product
 {
     const STATUS_CREATED = 0;
     const STATUS_DRAFT = 1;
-    const STATUS_OPEN = 2;
-    const STATUS_CHECKOUT = 3;
+    const STATUS_PUBLISHED = 2;
+    const STATUS_UNPUBLISHED = 3;
 
     private $id;
 

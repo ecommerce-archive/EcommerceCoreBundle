@@ -168,6 +168,17 @@ class Product
 
 
     /**
+     * @param string $name
+     * @param mixed  $default
+     * @return array|mixed|null
+     */
+    public function getProperty($name, $default = null)
+    {
+        return $this->node->getPropertyValueWithDefault($name, $default);
+    }
+
+
+    /**
      * @param $name
      * @return bool
      */
@@ -187,6 +198,39 @@ class Product
         $this->node->setProperty($name, $value);
 
         return $this;
+    }
+
+    public function getTranslatedProperty($name)
+    {
+        if (!$this->node->hasProperty($name)) {
+            return null;
+        }
+        $translations = $this->node->getPropertyValue($name);
+
+        if (is_array($translations) || !$this->node->hasProperty($name.'_locales')) {
+            return null;
+        }
+
+        $locales = $this->node->getPropertyValue($name);
+
+        if (is_array($locales) || count($translations) !== count($locales)) {
+            return null;
+        }
+
+
+        return array_combine($locales, $translations);
+    }
+
+    public function setTranslatedProperty($name, $value)
+    {
+        if (!is_array($value)) {
+            return null;
+        }
+
+        $this->node->setProperty($name, array_values($value));
+        $this->node->setProperty($name.'_locales', array_keys($value));
+
+        return true;
     }
 
     public function getIterator()

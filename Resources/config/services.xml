@@ -17,6 +17,7 @@
         <parameter key="ecommerce_core.cart.manager.class">Ecommerce\Bundle\CoreBundle\Cart\Manager</parameter>
         <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
         <parameter key="ecommerce_core.product.handler_manager.class">Ecommerce\Bundle\CoreBundle\Product\HandlerManager</parameter>
+        <parameter key="ecommerce_core.product.form.type.translated_property.class">Ecommerce\Bundle\CoreBundle\Product\Form\Type\TranslatedPropertyType</parameter>
         <parameter key="ecommerce_core.controller_utils.class">Ecommerce\Bundle\CoreBundle\Util\ControllerUtils</parameter>
         <parameter key="ecommerce_core.cart.controller.class">Ecommerce\Bundle\CoreBundle\Controller\CartController</parameter>
         <parameter key="ecommerce_core.product.controller.class">Ecommerce\Bundle\CoreBundle\Controller\ProductController</parameter>
@@ -86,6 +87,12 @@
         <service id="ecommerce_core.product.handler_manager" class="%ecommerce_core.product.handler_manager.class%">
             <argument type="collection"/>
             <!--<argument type="service" id="ecommerce_core.product_handlers" />-->
+        </service>
+
+        <service id="ecommerce_core.product.form.type.translated_property" class="%ecommerce_core.product.form.type.translated_property.class%">
+            <tag name="form.type" alias="ecommerce_type_translated_property" />
+            <argument type="service" id="translator" />
+            <argument>%locales%</argument>
         </service>
 
         <service id="ecommerce_core.cart.controller" class="%ecommerce_core.cart.controller.class%">

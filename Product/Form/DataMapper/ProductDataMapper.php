@@ -1,6 +1,6 @@
 <?php
 
-namespace Ecommerce\Bundle\CoreBundle\Product\Form;
+namespace Ecommerce\Bundle\CoreBundle\Product\Form\DataMapper;
 
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;

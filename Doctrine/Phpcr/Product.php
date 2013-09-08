@@ -207,13 +207,13 @@ class Product
         }
         $translations = $this->node->getPropertyValue($name);
 
-        if (is_array($translations) || !$this->node->hasProperty($name.'_locales')) {
+        if (!is_array($translations) || !$this->node->hasProperty($name.'_locales')) {
             return null;
         }
 
-        $locales = $this->node->getPropertyValue($name);
+        $locales = $this->node->getPropertyValue($name.'_locales');
 
-        if (is_array($locales) || count($translations) !== count($locales)) {
+        if (!is_array($locales) || count($translations) !== count($locales)) {
             return null;
         }
 
@@ -227,7 +227,14 @@ class Product
             return null;
         }
 
-        $this->node->setProperty($name, array_values($value));
+        $translations = array_map(
+            function($value) {
+                return (string)$value;
+            },
+            array_values($value)
+        );
+
+        $this->node->setProperty($name, $translations);
         $this->node->setProperty($name.'_locales', array_keys($value));
 
         return true;

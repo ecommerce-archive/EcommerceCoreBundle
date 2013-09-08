@@ -91,13 +91,11 @@
         <service id="ecommerce_core.cart.controller" class="%ecommerce_core.cart.controller.class%">
             <argument type="service" id="ecommerce_core.controller_utils" />
             <argument type="service" id="ecommerce_core.cart.manager" />
-            <argument type="service" id="service_container" />
         </service>
 
         <service id="ecommerce_core.product.controller" class="%ecommerce_core.product.controller.class%">
             <argument type="service" id="ecommerce_core.controller_utils" />
             <argument type="service" id="ecommerce_core.product.manager" />
-            <argument type="service" id="service_container" />
         </service>
 
         <service id="ecommerce_core.controller_utils" class="%ecommerce_core.controller_utils.class%">

@@ -29,7 +29,7 @@
 
         <locale name="locale" />
 
-        <field name="name" type="string" translated="true" />
+        <field name="name" type="string" translated="false" />
 
         <field name="status" type="long" />
 

@@ -12,12 +12,14 @@
         <parameter key="ecommerce_core.product_reference.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference</parameter>
         <parameter key="ecommerce_core.product_reference.repository.class">Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository</parameter>
         <parameter key="ecommerce_core.product.class">Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product</parameter>
+        <parameter key="ecommerce_core.product.repository.class">Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\ProductRepository</parameter>
         <parameter key="ecommerce_core.event_listener.doctrine_orm_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrineOrmSubscriber</parameter>
         <parameter key="ecommerce_core.event_listener.doctrine_phpcr_subscriber.class">Ecommerce\Bundle\CoreBundle\EventListener\DoctrinePhpcrSubscriber</parameter>
         <parameter key="ecommerce_core.cart.manager.class">Ecommerce\Bundle\CoreBundle\Cart\Manager</parameter>
         <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
         <parameter key="ecommerce_core.product.handler_manager.class">Ecommerce\Bundle\CoreBundle\Product\HandlerManager</parameter>
         <parameter key="ecommerce_core.product.form.type.translated_property.class">Ecommerce\Bundle\CoreBundle\Product\Form\Type\TranslatedPropertyType</parameter>
+        <parameter key="ecommerce_core.twig.ecommerce_extension.class">Ecommerce\Bundle\CoreBundle\Twig\EcommerceExtension</parameter>
         <parameter key="ecommerce_core.controller_utils.class">Ecommerce\Bundle\CoreBundle\Util\ControllerUtils</parameter>
         <parameter key="ecommerce_core.cart.controller.class">Ecommerce\Bundle\CoreBundle\Controller\CartController</parameter>
         <parameter key="ecommerce_core.product.controller.class">Ecommerce\Bundle\CoreBundle\Controller\ProductController</parameter>
@@ -27,7 +29,7 @@
     <services>
 
         <service id="ecommerce_core.cart.repository"
-            class="%ecommerce_core.product_reference.repository.class%"
+            class="%ecommerce_core.cart.repository.class%"
             factory-service="doctrine"
             factory-method="getRepository">
             <argument>%ecommerce_core.cart.class%</argument>
@@ -48,7 +50,7 @@
         </service>
 
         <service id="ecommerce_core.product.repository"
-            class="Doctrine\ODM\PHPCR\DocumentRepository"
+            class="%ecommerce_core.product.repository.class%"
             factory-service="doctrine_phpcr.odm.document_manager"
             factory-method="getRepository">
             <argument>%ecommerce_core.product.class%</argument>
@@ -92,7 +94,19 @@
         <service id="ecommerce_core.product.form.type.translated_property" class="%ecommerce_core.product.form.type.translated_property.class%">
             <tag name="form.type" alias="ecommerce_type_translated_property" />
             <argument type="service" id="translator" />
-            <argument>%locales%</argument>
+            <argument>%locale_fallbacks%</argument>
+        </service>
+
+        <service id="ecommerce_core.product.form.type.translated_property" class="%ecommerce_core.product.form.type.translated_property.class%">
+            <tag name="form.type" alias="ecommerce_type_translated_property" />
+            <argument type="service" id="translator" />
+            <argument>%locale_fallbacks%</argument>
+        </service>
+
+        <service id="ecommerce_core.twig.ecommerce_extension" class="%ecommerce_core.twig.ecommerce_extension.class%">
+            <tag name="twig.extension" />
+            <argument type="service" id="translator" />
+            <argument>%locale_fallbacks%</argument>
         </service>
 
         <service id="ecommerce_core.cart.controller" class="%ecommerce_core.cart.controller.class%">

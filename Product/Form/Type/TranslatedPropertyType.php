@@ -36,7 +36,7 @@ class TranslatedPropertyType extends AbstractType
     {
 //        $builder->setDataMapper(new ProductDataMapper());
 
-        foreach ($this->locales as $locale) {
+        foreach ($this->locales as $locale => $fallbacks) {
 //            $builder->add($locale, 'text', array_merge(array('required' => false), $options['field_options'], array('translate_field' => true)));
             $builder->add($locale, 'text', array_merge(array('required' => false), $options['field_options']));
         }

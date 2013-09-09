@@ -1,7 +1,7 @@
 {
     "name": "ecommerce/core-bundle",
     "type": "symfony-bundle",
-    "description": "Ecommerce Core Bundle",
+    "description": "Ecommerce Core Bundle for Symfony",
     "keywords": ["ecommerce"],
     "license": "MIT",
     "authors": [

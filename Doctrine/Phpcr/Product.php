@@ -161,7 +161,7 @@ class Product
      * @param $name
      * @return array|mixed|\PHPCR\NodeInterface|resource
      */
-    public function get($name)
+    public function getProperty($name)
     {
         return $this->node->getPropertyValue($name);
     }
@@ -172,7 +172,7 @@ class Product
      * @param mixed  $default
      * @return array|mixed|null
      */
-    public function getProperty($name, $default = null)
+    public function get($name, $default = null)
     {
         return $this->node->getPropertyValueWithDefault($name, $default);
     }

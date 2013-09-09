@@ -1,5 +1,8 @@
 # Ecommerce Core Bundle
 
+Question? Bug? Feature request? Feedback? [Please don’t hesitate to open an issue - I will get back to you asap!](https://github.com/ecommerce/EcommerceCoreBundle/issues)
+
+
 ## Introduction
 
 This bundle is a base to build a Symfony2 ecommerce application. It focuses on solutions with a high degree of customization. It’s a toolset to implement your own business and application logic. If you’re looking for a 'out of the box' webshop you should rather choose a different solution like [Sylius](http://Sylius.org) or [Vespolina](https://github.com/vespolina). It takes care of persistence and you can optionally use the RESTful controllers for the products and the cart. You write your own product handler (or several ones if your project requires it) which defines the product properties (as many as you want and translatable without having to update the database thanks to [PHPCR](http://phpcr.github.io/)), product options, cart item validation and product availability. You can hook into all different kinds of events to adapt the provided application flow to your needs.
@@ -33,6 +36,10 @@ ecommerce_core.product.repository                              | [Ecommerce\Bund
 ecommerce_core.product_reference.repository                    | [Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Doctrine/Orm/ProductReferenceRepository.php)
 ecommerce_core.twig.ecommerce_extension                        | [Ecommerce\Bundle\CoreBundle\Twig\EcommerceExtension](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Twig/EcommerceExtension.php)
 ecommerce_core.controller_utils                                | [Ecommerce\Bundle\CoreBundle\Util\ControllerUtils](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Util/ControllerUtils.php)
+
+Use the tag ``ecommmerce.product_handler`` to register your [product handler](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Product/ProductHandlerInterface.php).
+
+[Products (Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product)](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Doctrine/Phpcr/Product.php) are stored in PHPCR but a simple [ProductReference (Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference)](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Doctrine/Orm/ProductReference.php) entity is stored in ORM so it can be associated with a [CartItem (Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem)](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Doctrine/Orm/CartItem.php). The [Cart (Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem)](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Doctrine/Orm/Cart.php) entity is very basic for now but will be updated soon to include subtotals, discounts, tax information etc.
 
 To create a form type for a product use the 
 [Ecommerce\Bundle\CoreBundle\Product\Form\DataMapper\ProductDataMapper](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Product/Form/DataMapper/ProductDataMapper.php) as the DataMapper (``$builder->setDataMapper(new ProductDataMapper());`` in the ``buildForm`` method) and the ``ecommerce_type_translated_property`` form type for product properties that should be translatable. Those properties can then be rendered using the twig function ``translate_property(product, property)``.
@@ -73,8 +80,8 @@ You can check out the [ecommerce-sandbox](https://github.com/ecommerce/ecommerce
 - Create the Elasticsearch/Elastica bundle
 - Add checkout event system
 - Testing (decide on testing methods)
-- Move the REST controllers to a seperate bundle
-- Move translatable product properties to a seperate bundle
+- Move the REST controllers to a separate bundle
+- Move translatable product properties to a separate bundle
 
 Feel free to open an issue for any feature request!
 

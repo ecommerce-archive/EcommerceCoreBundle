@@ -84,6 +84,7 @@ Feel free to open an issue for any feature request!
 
 This bundle is under the MIT license. See the complete license in the bundle:
 
-    [``Resources/meta/LICENSE``](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Resources/meta/LICENSE) file.
+[Resources/meta/LICENSE](https://github.com/ecommerce/EcommerceCoreBundle/blob/master/Resources/meta/LICENSE)
+
 
 Please note that it requires other libraries to run (see [Packagist](https://packagist.org/packages/ecommerce/core-bundle)) and not all of them are MIT-licensed (like Apache 2.0).

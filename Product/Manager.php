@@ -49,7 +49,7 @@ class Manager
      * @param bool $withNode
      * @return null|Product
      */
-    public function createProduct($name = false, $withNode = false)
+    public function createProduct($name = null, $withNode = false)
     {
         $product = new Product();
 
@@ -59,7 +59,7 @@ class Manager
             if ($parentNode->getNode()->hasNode($name)) {
                 return null;
             }
-        } else {
+        } elseif ($name === null) {
             $name = sha1(mt_rand());
         }
 

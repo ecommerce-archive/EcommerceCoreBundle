@@ -2,7 +2,7 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Product;
 
-use Ecommerce\Bundle\CoreBundle\Doctrine\Orm\CartItem;
+use Ecommerce\Bundle\CoreBundle\Cart\CartItemValidatorInterface;
 // @TODO: Change back to ProductInterface
 use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product as ProductInterface;
 
@@ -15,14 +15,17 @@ interface ProductHandlerInterface
     public function supports(ProductInterface $product);
 
     /**
-     * @param ProductInterface $product
-     * @return CartHandlerInterface
+     * @return CartItemValidatorInterface|null
      */
-    public function getCartHandler(ProductInterface $product);
+    public function getCartItemValidator();
 
     /**
-     * @param CartItem $cartItem
-     * @return CartItemValidatorInterface
+     * @return ProductAvailabilityCheckerInterface|null
      */
-    public function getCartItemValidator(CartItem $cartItem);
+    public function getProductAvailabilityChecker();
+
+    /**
+     * @return OrderProcessorInterface|null
+     */
+    public function getOrderProcessor();
 }

@@ -146,15 +146,16 @@ class Manager
      * @param         $field
      * @param         $values
      *
-     * $descriptions = array(
-     *   'en' => 'what',
-     *   'de' => 'was',
+     * $values = array(
+     *   'en' => 'Hello',
+     *   'de' => 'Hallo',
+     *   'fr' => 'Salut',
      * );
      *
      */
     public function setTranslation(Product $product, $field, $values)
     {
-        $product->node->setProperty($field, $values);
+        $product->node->setProperty($field, array_values($values));
         $product->node->setProperty($field.'_local', array_keys($values));
     }
 

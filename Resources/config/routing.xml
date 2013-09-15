@@ -8,40 +8,8 @@
         <default key="_controller">EcommerceCoreBundle:Sandbox:index</default>
     </route>
 
-    <route id="ecommerce_products" path="/products/" methods="GET">
-        <default key="_controller">ecommerce_core.product.controller:indexAction</default>
-    </route>
+    <import resource="@EcommerceCoreBundle/Resources/config/routing/cart.xml" prefix="/cart" />
 
-    <route id="ecommerce_product_view_id" path="/products/{id}" methods="GET">
-        <default key="_controller">ecommerce_core.product.controller:viewAction</default>
-        <requirement key="id">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
-    </route>
-
-    <route id="ecommerce_product_view_slug" path="/products/{slug}" methods="GET">
-        <default key="_controller">ecommerce_core.product.controller:viewAction</default>
-    </route>
-
-
-    <route id="ecommerce_cart" path="/cart/" methods="GET">
-        <default key="_controller">ecommerce_core.cart.controller:indexAction</default>
-    </route>
-
-    <route id="ecommerce_cart_clear" path="/cart/" methods="DELETE">
-        <default key="_controller">ecommerce_core.cart.controller:clearCartAction</default>
-    </route>
-
-    <route id="ecommerce_cart_add_product" path="/cart/" methods="POST">
-        <default key="_controller">ecommerce_core.cart.controller:addProductAction</default>
-    </route>
-
-    <route id="ecommerce_cart_item_view" path="/cart/item/{cartItemId}" methods="GET">
-        <default key="_controller">ecommerce_core.cart.controller:cartItemAction</default>
-        <requirement key="cartItemId">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
-    </route>
-
-    <route id="ecommerce_cart_item_remove" path="/cart/item/{cartItemId}" methods="DELETE">
-        <default key="_controller">ecommerce_core.cart.controller:removeCartItemAction</default>
-        <requirement key="cartItemId">[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}</requirement>
-    </route>
+    <import resource="@EcommerceCoreBundle/Resources/config/routing/product.xml" prefix="/product" />
 
 </routes>

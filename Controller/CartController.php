@@ -2,6 +2,8 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Controller;
 
+use Ecommerce\Bundle\CoreBundle\Cart\CartItemValidatorInterface;
+use Ecommerce\Bundle\CoreBundle\Product\ProductAvailabilityCheckerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -190,25 +192,191 @@ class CartController
         }
 
         $product->setProductReference($productReference);
+        $productReference->setProduct($product);
 
-        $options = $request->request->get('option');
 
 //        $productTypeManager = $this->get('ecommerce_core.product.type_manager');
         /** @var HandlerManager $productHandlerManager */
         $productHandlerManager = $this->utils->get('ecommerce_core.product.handler_manager');
 
+        $productHandler = $productHandlerManager->getProductHandler($product);
+        if (!$productHandler) {
+
+            // @TODO: Dispatch event
+
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view =
+                        View::create(
+                            array(
+                                 'message' => sprintf('Product with id %s could not be added to the cart', $productId),
+                                 'errors' => array(
+                                     sprintf('Product with id %s could not be added to the cart', $productId) // @TODO: Add errors/options?
+                                 )
+                            ),
+                            Codes::HTTP_UNPROCESSABLE_ENTITY
+                        );
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', sprintf('Product with id %s could not be added to the cart', $productId));
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
+        }
+
+        $options = $request->request->get('option');
 
         // @TODO: event cart pre add item
 
-        try {
-            $cartItem = $productHandlerManager->resolveCartItem($product, $options);
+        $cartItem = new CartItem();
+        $cartItem->setProduct($product->getProductReference());
+        $cartItem->setOptions($options);
 
-            if ($cartItem instanceof CartItem) {
+        $cartItemValidator = $productHandler->getCartItemValidator();
 
-                $cartItem->setCart($cart);
+        if ($cartItemValidator instanceof CartItemValidatorInterface) {
+            try {
+                $valid = $cartItemValidator->isValid($cartItem);
 
-                $this->cartManager->save();
+                if (!$valid) {
+                    throw new \Exception('Not a valid cart item');
+                }
+            } catch (\Exception $e) {
+
+                // @TODO: Dispatch event
+
+                switch ($request->getRequestFormat()) {
+                    case 'json':
+                        $view =
+                            View::create(
+                                array(
+                                     'message' => sprintf('Product with id %s could not be added to the cart', $productId),
+                                     'errors' => array(
+                                         sprintf('Product with id %s could not be added to the cart', $productId) // @TODO: Add errors/options?
+                                     )
+                                ),
+                                Codes::HTTP_UNPROCESSABLE_ENTITY
+                            );
+                        break;
+
+                    case 'html':
+                        // @TODO: Move into cart manager event
+                        $request->getSession()->getFlashBag()->add('error', sprintf('Product with id %s could not be added to the cart', $productId));
+
+                        if ($referer = $request->headers->get('Referer')) {
+                            $view = $this->utils->redirectView($referer);
+                            break;
+                        }
+                        $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                        break;
+
+                    default:
+                        throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+                }
+
+                return $view;
             }
+        }
+
+        $priceCalculator = $productHandler->getPriceCalculator();
+
+        try {
+            $success = $priceCalculator->calculatePrice($product, $cartItem);
+
+        } catch (\Exception $e) {
+
+            // @TODO: Dispatch event
+
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view =
+                        View::create(
+                            array(
+                                 'message' => sprintf('Product with id %s could not be added to the cart', $productId),
+                                 'errors' => array(
+                                     sprintf('Product with id %s could not be added to the cart', $productId) // @TODO: Add errors/options?
+                                 )
+                            ),
+                            Codes::HTTP_UNPROCESSABLE_ENTITY
+                        );
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', $e->getMessage());
+    //                    $request->getSession()->getFlashBag()->add('error', sprintf('Product with id %s could not be added to the cart', $productId));
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
+        }
+
+        $productAvailabilityChecker = $productHandler->getProductAvailabilityChecker();
+
+        if ($productAvailabilityChecker instanceof ProductAvailabilityCheckerInterface
+            && !$productAvailabilityChecker->isAvailable($productId, $options)
+        ) {
+
+            // @TODO: Dispatch event
+
+            switch ($request->getRequestFormat()) {
+                case 'json':
+                    $view =
+                        View::create(
+                            array(
+                                 'message' => sprintf('Product with id %s could not be added to the cart because it’s not available', $productId),
+                                 'errors' => array(
+                                     sprintf('Product with id %s could not be added to the cart because it’s not available', $productId) // @TODO: Add errors/options?
+                                 )
+                            ),
+                            Codes::HTTP_UNPROCESSABLE_ENTITY
+                        );
+                    break;
+
+                case 'html':
+                    // @TODO: Move into cart manager event
+                    $request->getSession()->getFlashBag()->add('error', sprintf('Product with id %s could not be added to the cart because it’s not available', $productId));
+
+                    if ($referer = $request->headers->get('Referer')) {
+                        $view = $this->utils->redirectView($referer);
+                        break;
+                    }
+                    $view = $this->utils->routeRedirectView('ecommerce_cart', array(), Codes::HTTP_FOUND);
+                    break;
+
+                default:
+                    throw new \Exception(sprintf('Unexpected request format "%s"', $request->getRequestFormat()));
+            }
+
+            return $view;
+        }
+
+        try {
+            $cartItem->setCart($cart);
+
+            $this->cartManager->save();
+
         } catch (\Exception $e) {
 
             // @TODO: Dispatch event

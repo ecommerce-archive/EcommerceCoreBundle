@@ -2,7 +2,7 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Doctrine\Orm;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CartItem
 {
@@ -80,8 +80,8 @@ class CartItem
      * @param ProductReference|string $product
      * @return CartItem
      */
-//    public function setProduct(ProductReference $product = null)
-    public function setProduct($product = null)
+    public function setProduct(ProductReference $product = null)
+//    public function setProduct($product = null)
     {
         $this->product = $product;
 
@@ -90,7 +90,7 @@ class CartItem
 
 
     /**
-     * @return ProductReference
+     * @return ProductReference|null
      */
     public function getProduct()
     {
@@ -99,7 +99,7 @@ class CartItem
 
 
     /**
-     * @return ProductReference
+     * @return string|null
      */
     public function getProductId()
     {
@@ -129,6 +129,15 @@ class CartItem
     public function getOptions()
     {
         return $this->options;
+    }
+
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getOptionsAsCollection()
+    {
+        return new ArrayCollection($this->options);
     }
 
 

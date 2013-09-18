@@ -42,6 +42,7 @@ class ProductDataMapper implements DataMapperInterface
         $node = $data->getNode();
 
         if (!$node instanceof Node) {
+            return;
             throw new UnexpectedTypeException($data, 'Jackalope\\Node');
         }
 
@@ -87,6 +88,10 @@ class ProductDataMapper implements DataMapperInterface
             if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
                 if ($config->getOption('translate_field', false) && is_array($form->getData())) {
                     $data->setTranslatedProperty(strval($propertyPath), $form->getData());
+                } elseif ($config->getOption('image_path', false)) {
+                    if ($form->getData() !== null) {
+                        $node->setProperty(strval($propertyPath), $form->getData());
+                    }
                 } elseif (!is_object($data) || !$config->getByReference() || $form->getData() !== $node->getPropertyValueWithDefault(strval($propertyPath), null)) {
                     $node->setProperty(strval($propertyPath), $form->getData());
                 }

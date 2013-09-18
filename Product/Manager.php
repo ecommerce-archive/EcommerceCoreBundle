@@ -10,10 +10,12 @@ use Doctrine\ODM\PHPCR\Document\Generic;
 
 use PHPCR\ItemExistsException;
 
+use Jackalope\Session;
 use Jackalope\Factory;
 use Jackalope\Node;
 
 use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product;
+use Ecommerce\Bundle\CoreBundle\Product\Elastica\Helper as ElasticaHelper;
 
 
 class Manager
@@ -32,10 +34,11 @@ class Manager
     /**
      * Constructor.
      */
-    public function __construct(DocumentManager $dm, $basepath)
+    public function __construct(DocumentManager $dm, $basepath, ElasticaHelper $elasticaHelper)
     {
-        $this->dm        = $dm;
-        $this->basepath  = $basepath;
+        $this->dm             = $dm;
+        $this->basepath       = $basepath;
+        $this->elasticaHelper = $elasticaHelper;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $dispatcher)
@@ -68,13 +71,20 @@ class Manager
         $product->setName($name);
 
         if ($withNode) {
-            $product->node = new Node(
-                new Factory(),
-                new \stdClass(),
-                $this->getProductNode()->getId().'/'.$product->getNodename(),
-                $this->dm->getPhpcrSession(),
-                $this->dm->getPhpcrSession()->getObjectManager()
-            );
+            /** @var Session $phpcr */
+            $phpcr = $this->dm->getPhpcrSession();
+            $productNodeTmp = $phpcr->getNode($this->basepath.'_tmp');
+            $node = $productNodeTmp->addNode($name, 'nt:unstructured');
+
+            $product->node = $node;
+
+//            $tmp = new Node(
+//                new Factory(),
+//                new \stdClass(),
+//                $this->getProductNode()->getId().'/'.$product->getNodename(),
+//                $this->dm->getPhpcrSession(),
+//                $this->dm->getPhpcrSession()->getObjectManager()
+//            );
         }
 
         return $product;
@@ -108,6 +118,29 @@ class Manager
         }
     }
 
+    public function clearTmp()
+    {
+        try {
+            /** @var Session $phpcr */
+            $phpcr = $this->dm->getPhpcrSession();
+            $productNodeTmp = $phpcr->getNode($this->basepath.'_tmp');
+
+            $children = $productNodeTmp->getNodes();
+
+            foreach ($children as $child) {
+                /** @var Node $child */
+                $phpcr->removeItem($child->getPath());
+            }
+
+            $phpcr->save();
+
+            return true;
+        } catch (ItemExistsException $e) {
+            return false;
+        }
+    }
+
+
     /**
      * @param string $id
      * @return Product|null
@@ -138,6 +171,13 @@ class Manager
         }
 
         return $this->products = $this->getProductNode()->getChildren();
+    }
+
+    /**
+     */
+    public function populateElasticsearch()
+    {
+        $this->elasticaHelper->populate();
     }
 
 

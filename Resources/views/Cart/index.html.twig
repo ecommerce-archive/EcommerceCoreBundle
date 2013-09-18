@@ -47,6 +47,10 @@
                 <th>product name</th>
                 <td>{{ item.product.name }}</td>
               </tr>
+              <tr>
+                <th>price</th>
+                <td>{{ item.price|number_format(2, ',', '.') }}</td>
+              </tr>
             </tbody>
           </table>
           <ol>

@@ -18,11 +18,15 @@
         <parameter key="ecommerce_core.cart.manager.class">Ecommerce\Bundle\CoreBundle\Cart\Manager</parameter>
         <parameter key="ecommerce_core.product.manager.class">Ecommerce\Bundle\CoreBundle\Product\Manager</parameter>
         <parameter key="ecommerce_core.product.handler_manager.class">Ecommerce\Bundle\CoreBundle\Product\HandlerManager</parameter>
+        <parameter key="ecommerce_core.product.form.type.translated_property_text.class">Ecommerce\Bundle\CoreBundle\Product\Form\Type\TranslatedPropertyTextType</parameter>
         <parameter key="ecommerce_core.product.form.type.translated_property.class">Ecommerce\Bundle\CoreBundle\Product\Form\Type\TranslatedPropertyType</parameter>
+        <parameter key="ecommerce_core.product.form.type.file.class">Ecommerce\Bundle\CoreBundle\Product\Form\Type\FileType</parameter>
         <parameter key="ecommerce_core.twig.ecommerce_extension.class">Ecommerce\Bundle\CoreBundle\Twig\EcommerceExtension</parameter>
         <parameter key="ecommerce_core.controller_utils.class">Ecommerce\Bundle\CoreBundle\Util\ControllerUtils</parameter>
         <parameter key="ecommerce_core.cart.controller.class">Ecommerce\Bundle\CoreBundle\Controller\CartController</parameter>
         <parameter key="ecommerce_core.product.controller.class">Ecommerce\Bundle\CoreBundle\Controller\ProductController</parameter>
+        <parameter key="ecommerce_core.product.elastica.helper.class">Ecommerce\Bundle\CoreBundle\Product\Elastica\Helper</parameter>
+        <parameter key="ecommerce_core.product.elastica.provider.class">Ecommerce\Bundle\CoreBundle\Product\Elastica\Provider</parameter>
         <!--<parameter key="ecommerce_core.cart.session_storage_key">_ecommerce_cart_id</parameter>-->
     </parameters>
 
@@ -81,6 +85,7 @@
         <service id="ecommerce_core.product.manager" class="%ecommerce_core.product.manager.class%">
             <argument type="service" id="doctrine_phpcr.odm.document_manager" />
             <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
+            <argument type="service" id="ecommerce_core.product.elastica.helper" />
             <call method="setEventDispatcher">
                 <argument type="service" id="event_dispatcher" />
             </call>
@@ -97,8 +102,12 @@
             <argument>%locale_fallbacks%</argument>
         </service>
 
-        <service id="ecommerce_core.product.form.type.translated_property" class="%ecommerce_core.product.form.type.translated_property.class%">
-            <tag name="form.type" alias="ecommerce_type_translated_property" />
+        <service id="ecommerce_core.product.form.type.file" class="%ecommerce_core.product.form.type.file.class%">
+            <tag name="form.type" alias="ecommerce_type_file" />
+        </service>
+
+        <service id="ecommerce_core.product.form.type.translated_property_text" class="%ecommerce_core.product.form.type.translated_property_text.class%">
+            <tag name="form.type" alias="ecommerce_type_translated_property_text" />
             <argument type="service" id="translator" />
             <argument>%locale_fallbacks%</argument>
         </service>
@@ -125,9 +134,45 @@
             </call>
         </service>
 
+        <service id="sonata.admin.product" class="Ecommerce\Bundle\CoreBundle\Admin\ProductAdmin">
+            <tag name="sonata.admin" manager_type="doctrine_phpcr" group="Content" label="Product"/>
+            <argument />
+            <argument>%ecommerce_core.product.class%</argument>
+            <argument />
+            <argument type="service" id="ecommerce_core.product.manager" />
+
+            <call method="setTranslationDomain">
+                <argument>EcommerceCoreBundle</argument>
+            </call>
+
+            <call method="setRootPath">
+                <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
+            </call>
+
+            <call method="setRouteBuilder">
+                <argument type="service" id="sonata.admin.route.path_info_slashes" />
+            </call>
+        </service>
+
+        <service id="ecommerce_core.product.elastica.helper" class="%ecommerce_core.product.elastica.helper.class%">
+            <argument type="service" id="fos_elastica.index_manager" />
+            <argument type="service" id="fos_elastica.provider_registry" />
+            <argument type="service" id="fos_elastica.resetter" />
+        </service>
+
+        <service id="ecommerce_core.product.elastica.provider" class="%ecommerce_core.product.elastica.provider.class%">
+            <argument type="service" id="fos_elastica.index.glamourrent.products" />
+            <argument type="service" id="ecommerce_core.product.manager" />
+            <tag name="fos_elastica.provider" index="glamourrent" type="products" />
+        </service>
+
+
+
+
         <service id="ecommerce_core.initializer" class="Doctrine\Bundle\PHPCRBundle\Initializer\GenericInitializer">
             <argument type="collection">
                 <argument>%ecommerce_core.persistence.phpcr.product_basepath%</argument>
+                <argument>%ecommerce_core.persistence.phpcr.product_basepath%_tmp</argument>
             </argument>
             <tag name="doctrine_phpcr.initializer" />
         </service>

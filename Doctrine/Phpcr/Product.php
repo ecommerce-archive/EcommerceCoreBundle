@@ -159,9 +159,10 @@ class Product
 
     /**
      * @param $name
+     * @param integer|null $type
      * @return array|mixed|\PHPCR\NodeInterface|resource
      */
-    public function getProperty($name)
+    public function getProperty($name, $type = null)
     {
         return $this->node->getPropertyValue($name);
     }
@@ -234,6 +235,15 @@ class Product
             array_values($value)
         );
 
+        // When switching to multilanguage you have to unset the property first to prevent a PHPCR\ValueFormatException
+        if ($this->node->hasProperty($name) && ($currentProperty = $this->node->getProperty($name)) && !is_array($currentProperty->getValue())) {
+            $this->node->unsetProperty($name);
+        }
+
+        if ($this->node->hasProperty($name.'_locales') && ($currentLocaleProperty = $this->node->getProperty($name.'_locales')) && !is_array($currentLocaleProperty->getValue())) {
+            $this->node->unsetProperty($name.'_locales');
+        }
+
         $this->node->setProperty($name, $translations);
         $this->node->setProperty($name.'_locales', array_keys($value));
 
@@ -254,6 +264,31 @@ class Product
                 || strpos($key, 'phpcr:') === 0
             ) {
                 unset($properties[$key]);
+            }
+        }
+
+        return $properties;
+    }
+
+    public function getTranslatedProperties()
+    {
+        $ignoredProperties = array(
+            'jcr:primaryType',
+            'jcr:mixinTypes',
+            'phpcr:class',
+            'phpcr:classparents',
+            'jcr:uuid',
+        );
+
+        $properties = array_diff_key($this->node->getPropertiesValues(), array_flip($ignoredProperties));
+
+        foreach ($properties as $key => $property) {
+            if (is_array($property)
+                && array_key_exists($key.'_locales', $properties)
+                && is_array($propertyLocales = $properties[$key.'_locales'])
+            ) {
+                $properties[$key] = array_combine($propertyLocales, $property);
+                unset($properties[$key.'_locales']);
             }
         }
 

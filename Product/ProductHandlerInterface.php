@@ -15,14 +15,19 @@ interface ProductHandlerInterface
     public function supports(ProductInterface $product);
 
     /**
-     * @return CartItemValidatorInterface|null
+     * @return PriceCalculatorInterface
      */
-    public function getCartItemValidator();
+    public function getPriceCalculator();
 
     /**
      * @return ProductAvailabilityCheckerInterface|null
      */
     public function getProductAvailabilityChecker();
+
+    /**
+     * @return CartItemValidatorInterface|null
+     */
+    public function getCartItemValidator();
 
     /**
      * @return OrderProcessorInterface|null

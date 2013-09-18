@@ -10,7 +10,7 @@
             <lifecycle-callback type="preUpdate" method="setUpdatedAt" />
         </lifecycle-callbacks>
 
-        <id name="id" type="guid" column="id" column-definition="CHAR(36) NOT NULL">
+        <id name="id" type="string" length="36" column="id">
             <generator strategy="UUID" />
         </id>
 

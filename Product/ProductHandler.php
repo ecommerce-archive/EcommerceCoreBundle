@@ -8,19 +8,23 @@ use Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr\Product as ProductInterface;
 
 abstract class ProductHandler implements ProductHandlerInterface
 {
-    private $cartItemValidator;
+    private $priceCalculator;
 
     private $productAvailabilityChecker;
+
+    private $cartItemValidator;
 
     private $orderProcessor;
 
     public function __construct(
-        CartItemValidatorInterface $cartItemValidator = null,
+        PriceCalculatorInterface $priceCalculator,
         ProductAvailabilityCheckerInterface $productAvailabilityChecker = null,
+        CartItemValidatorInterface $cartItemValidator = null,
         OrderProcessorInterface $orderProcessor = null
     ) {
-        $this->cartItemValidator          = $cartItemValidator;
+        $this->priceCalculator            = $priceCalculator;
         $this->productAvailabilityChecker = $productAvailabilityChecker;
+        $this->cartItemValidator          = $cartItemValidator;
         $this->orderProcessor             = $orderProcessor;
     }
 
@@ -31,11 +35,11 @@ abstract class ProductHandler implements ProductHandlerInterface
     abstract public function supports(ProductInterface $product);
 
     /**
-     * @return CartItemValidatorInterface|null
+     * @return PriceCalculatorInterface
      */
-    public function getCartItemValidator()
+    public function getPriceCalculator()
     {
-        return null;
+        return $this->priceCalculator;
     }
 
     /**
@@ -43,7 +47,15 @@ abstract class ProductHandler implements ProductHandlerInterface
      */
     public function getProductAvailabilityChecker()
     {
-        return null;
+        return $this->productAvailabilityChecker;
+    }
+
+    /**
+     * @return CartItemValidatorInterface|null
+     */
+    public function getCartItemValidator()
+    {
+        return $this->cartItemValidator;
     }
 
     /**
@@ -51,6 +63,6 @@ abstract class ProductHandler implements ProductHandlerInterface
      */
     public function getOrderProcessor()
     {
-        return null;
+        return $this->orderProcessor;
     }
 }

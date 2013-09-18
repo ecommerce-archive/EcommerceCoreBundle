@@ -4,7 +4,7 @@
     <entity name="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReference" table="ecommerce_product_reference"
         repository-class="Ecommerce\Bundle\CoreBundle\Doctrine\Orm\ProductReferenceRepository">
 
-        <id name="id" type="guid" column="id" column-definition="CHAR(36) NOT NULL" />
+        <id name="id" type="string" length="36" column="id" />
 
         <!--<id name="id" type="guid" column="id" column-definition="CHAR(36) NOT NULL">
             <generator strategy="UUID" />

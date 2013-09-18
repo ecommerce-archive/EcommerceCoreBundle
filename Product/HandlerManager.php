@@ -52,6 +52,9 @@ class HandlerManager
             return $productHandler;
         }
 
+        return null;
+
+        // @TODO: Throw exception?
         throw new \Exception(sprintf('No product handler found for product "%s".', $product->getId()));
     }
 

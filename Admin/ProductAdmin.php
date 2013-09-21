@@ -161,6 +161,14 @@ class ProductAdmin extends Admin
      */
     public function postUpdate($object)
     {
+        $productReference = $object->getProductReference();
+        // @TODO: Event?
+        $rentalItems = $object->getAssociatedData('rental_items');
+
+        foreach ($rentalItems as $rentalItem) {
+            $rentalItem->setProductId($productReference->getId());
+        }
+
         $this->productManager->populateElasticsearch();
     }
 }

@@ -3,6 +3,7 @@
 namespace Ecommerce\Bundle\CoreBundle\Doctrine\Phpcr;
 
 use Doctrine\ODM\PHPCR\Document\Generic;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Jackalope\Node;
 
@@ -37,12 +38,16 @@ class Product
     /** @var ProductReference */
     private $productReference;
 
+    private $associatedData;
+
 
     public function __construct($locale = 'en')
     {
         $this->locale = $locale;
 
         $this->status = self::STATUS_CREATED;
+
+        $this->associatedData = new ArrayCollection();
     }
 
 
@@ -306,6 +311,31 @@ class Product
     public function getProductReference()
     {
         return $this->productReference;
+    }
+
+    public function setAssociatedData($name, $data)
+    {
+        $this->autoCreateArrayCollection();
+
+        $this->associatedData->set($name, $data);
+    }
+
+    public function getAssociatedData($name)
+    {
+        $this->autoCreateArrayCollection();
+
+        return $this->associatedData->get($name);
+    }
+
+    public function autoCreateArrayCollection()
+    {
+        if ($this->associatedData instanceof ArrayCollection) {
+            return false;
+        }
+
+        $this->associatedData = new ArrayCollection();
+
+        return true;
     }
 
 

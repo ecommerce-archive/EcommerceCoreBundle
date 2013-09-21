@@ -2,6 +2,7 @@
 
 namespace Ecommerce\Bundle\CoreBundle\Product\Form\DataMapper;
 
+use GlamourRent\AppBundle\Doctrine\Orm\RentalItemDress;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -86,6 +87,18 @@ class ProductDataMapper implements DataMapperInterface
             $config = $form->getConfig();
 
             if (null !== $propertyPath && $config->getMapped() && $form->isSynchronized() && !$form->isDisabled()) {
+
+                $formData = $form->getData();
+
+//                if ($formData instanceof RentalItemDress) {
+                if ($config->getName() === 'rental_items') {
+                    $data->setAssociatedData('rental_items', $formData);
+
+                    continue;
+                }
+
+                // @TODO: event?
+
                 if ($config->getOption('translate_field', false) && is_array($form->getData())) {
                     $data->setTranslatedProperty(strval($propertyPath), $form->getData());
                 } elseif ($config->getOption('image_path', false)) {

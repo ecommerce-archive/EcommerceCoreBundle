@@ -118,6 +118,17 @@ class Provider implements ProviderInterface
 //        $time = microtime(true) - $time_start;
 //        echo sprintf('%06f', $time)."\n";
 
+        $availability = array();
+
+        for ($i = 1; $i <= 90; $i++) {
+            if (!rand(0, 2)) {
+                $date = new \DateTime('+'.$i.'days');
+                $availability[] = $date->format('Y-m-d');
+            }
+        }
+
+        $data['availability'] = $availability;
+
         $data = $this->filterValues($data);
 
 
@@ -129,6 +140,57 @@ class Provider implements ProviderInterface
     }
 
     private function filterValues($data)
+    {
+        $renamedProperties = array(
+            'created_by' => 'jcr:createdBy',
+            'created_at' => 'jcr:created',
+            'updated_at' => 'jcr:lastModifiedBy',
+            'updated_by' => 'jcr:lastModified',
+        );
+
+        $filteredData = array();
+        foreach ($data as $property => $value) {
+
+            if (is_array($value) && !empty($value) && array_keys($value) !== range(0, count($value) - 1)) {
+
+                if ($throwLocaleAway = false) {
+                    $value = array_values($value);
+                } elseif ($mappingForTranslatedValues = true) {
+                    $nestedArray = array();
+                    foreach ($value as $locale => $translation) {
+                        $nestedArray[] = array(
+                            'locale' => $locale,
+                            'value' => $translation,
+                        );
+                    }
+                    $value = $nestedArray;
+                } else {
+                    $nestedArray = array();
+                    foreach ($value as $locale => $translation) {
+                        $nestedArray[] = array(
+                            $locale,
+                            $translation,
+                        );
+                    }
+                    $value = $nestedArray;
+                }
+            }
+
+            if ($value instanceof \DateTime) {
+                $value = $value->format('c');
+            }
+
+            if (($newPropertyKey = array_search($property, $renamedProperties)) !== false) {
+                $property = $newPropertyKey;
+            }
+
+            $filteredData[$property] = $value;
+        }
+
+        return $filteredData;
+    }
+
+    private function filterValues2($data)
     {
         foreach ($data as $property => $value) {
 

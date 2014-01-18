@@ -13,11 +13,11 @@
     "require": {
         "php": ">=5.3.3",
         "symfony/framework-bundle": "~2.2",
-        "jackalope/jackalope-doctrine-dbal": "1.0.0-beta3",
-        "doctrine/phpcr-bundle": "1.0.*@dev",
-        "doctrine/phpcr-odm": "1.0.*@dev",
-        "friendsofsymfony/rest-bundle": "1.0.*@dev",
-        "jms/serializer-bundle": "0.12.*"
+        "jackalope/jackalope-doctrine-dbal": "1.0.*",
+        "doctrine/phpcr-odm": "1.1.*",
+        "doctrine/phpcr-bundle": "1.1.*",
+        "friendsofsymfony/rest-bundle": "~1.2",
+        "jms/serializer-bundle": "~0.12"
     },
     "autoload":{
         "psr-0":{
